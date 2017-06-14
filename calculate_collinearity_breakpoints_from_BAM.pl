@@ -26,8 +26,9 @@ USAGE
 
 \n";
 
-my ($bam,$region,$bed,$genome,$help,$debug);
+my ($bam,$bed,$genome,$help,$debug);
 my $insert = 500;
+my $region = "";
 my $n = 1;
 
 GetOptions (
@@ -44,7 +45,7 @@ die $usage if $help;
 die $usage unless ($bam && $bed && $genome);
 
 print STDERR "[INFO] BAM file: $bam\n";
-print STDERR "[INFO] Region specified: $region\n" if ($region);
+print STDERR "[INFO] Region specified: $region\n" if ($region =~ /.+/);
 print STDERR "[INFO] Windows file: $bed\n";
 print STDERR "[INFO] Genome file: $genome\n";
 print STDOUT join (
