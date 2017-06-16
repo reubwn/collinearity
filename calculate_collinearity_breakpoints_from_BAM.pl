@@ -122,7 +122,7 @@ while (my $line = <$BED>) {
       "\t",
       $line,                              #window
       $total,                             #total reads
-      ($total/($window[2]-$window[1])),   #depth average
+      ($bases/($window[2]-$window[1])),   #depth average
       ($total - $same),                   #reads mapped to diff scaff
       (($total - $same)/$total),          #proportion
       $mate_unmapped,
