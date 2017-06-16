@@ -140,10 +140,14 @@ while (my $line = <$BED>) {
 close $BED;
 print STDERR "\n";
 
-my $stat_dryrun = Statistics::Descriptive::Full->new();
-$stat_dryrun->add_data(@isize_dryrun);
-print STDERR "\n[INFO] ISIZE mean: ".$stat_dryrun->mean();
-print STDERR "\n[INFO] ISIZE median: ".$stat_dryrun->median();
-print STDERR "\n[INFO] ISIZE 5\% and 95\%: ".$stat_dryrun->percentile(5).", ".$stat_dryrun->percentile(95);
+if ($dryrun) {
+  my $stat_dryrun = Statistics::Descriptive::Full->new();
+  $stat_dryrun->add_data(@isize_dryrun);
+  print STDERR "\n[INFO] ISIZE mean: ".$stat_dryrun->mean();
+  print STDERR "\n[INFO] ISIZE median: ".$stat_dryrun->median();
+  print STDERR "\n[INFO] ISIZE 5\% and 95\%: ".$stat_dryrun->percentile(5).", ".$stat_dryrun->percentile(95);
+}
 
 print STDERR "\n[INFO] Finished on ".`date`."\n";
+
+__END__
