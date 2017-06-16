@@ -87,7 +87,7 @@ while (my $window = <$BED>) {
     my @F = split (/\s+/, $_);
     if ($dryrun) {
       if ($F[6] eq "=") { ##mate on same scaffold
-        push (@inserts_dryrun, abs($F[8]));
+        #push (@inserts_dryrun, abs($F[8]));
       }
     } else {
       if ($F[6] eq "=") { ##mate on same scaffold
