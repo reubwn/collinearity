@@ -35,7 +35,7 @@ my ($bam,$bed,$genome,$dryrun,$help);
 my $insert = 500;
 my $region = "";
 my %stats_hash;
-my @inserts_dryrun;
+my @isize_dryrun;
 my $n = 1;
 
 GetOptions (
@@ -126,7 +126,7 @@ while (my $line = <$BED>) {
       $insert,
       ($insert/$total),
       ($stat->mean()),
-      ($stat->median())
+      ($stat->median()),
       "\n"
     );
   }
