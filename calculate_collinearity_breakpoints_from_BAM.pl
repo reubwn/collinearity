@@ -68,6 +68,9 @@ print STDOUT join (
   "\n"
 ) unless ($dryrun);
 
+my $stat = Statistics::Descriptive::Full->new();
+my $stat_dryrun = Statistics::Descriptive::Full->new();
+
 open (my $BED, $bed) or die "[ERROR] Cannot open $bed: $!\n";
 while (my $line = <$BED>) {
   next unless $line =~ /^$region/;
@@ -80,7 +83,7 @@ while (my $line = <$BED>) {
   # print $TMP "$window\n";
   # close $TMP;
 
-  my @insert_arr;
+  my @isize;
   my ($total,$same,$insert,$insert_avg) = (0,0,0,0);
   #open(my $SAM, "samtools view -F1536 -b $bam $region | bedtools intersect -sorted -g $genome -a stdin -b tmp.bed | samtools view - |");
   open(my $SAM, "samtools view -F1536 $bam $window[0]:$window[1]-$window[2] |");
@@ -88,14 +91,14 @@ while (my $line = <$BED>) {
     my @F = split (/\s+/, $_);
     if ($dryrun) {
       if ($F[6] eq "=") { ##mate on same scaffold
-        push (@inserts_dryrun, abs($F[8]));
+        push (@isize_dryrun, abs($F[8]));
       }
     } else {
       if ($F[6] eq "=") { ##mate on same scaffold
         $same++;
         $total++;
         $insert++ if ($F[8] > $insert);
-        push (@insert_arr, abs($F[8]));
+        push (@isize, abs($F[8]));
       } else {
         $total++;
       }
@@ -103,33 +106,35 @@ while (my $line = <$BED>) {
   }
   close $SAM;
   unless ($dryrun) {
-    $stats_hash{
-      'window' => $line,
-      'total'  => $total,
-      'diff'   => ($total - $same),
-      'prop_diff' => (($total - $same)/$total),
-      'biginsert' => $insert,
-      'prop_biginsert' => ($insert/$total),
-      'insert_avg' => (sum(@insert_arr)/scalar(@insert_arr))
-    };
-    # print STDOUT join (
-    #   "\t",
-    #   $window,
-    #   $total,
-    #   ($total - $same),
-    #   (($total - $same)/$total),
-    #   $insert,
-    #   ($insert/$total),
-    #   (sum(@insert_arr)/scalar(@insert_arr)),
-    #   "\n"
-    # );
+    # $stats_hash{
+    #   'window' => $line,
+    #   'total'  => $total,
+    #   'diff'   => ($total - $same),
+    #   'prop_diff' => (($total - $same)/$total),
+    #   'biginsert' => $insert,
+    #   'prop_biginsert' => ($insert/$total),
+    #   'insert_avg' => (sum(@insert_arr)/scalar(@insert_arr))
+    # };
+    my $stat = Statistics::Descriptive::Full->new();
+    $stat->add_data(@isize);
+    print STDOUT join (
+      "\t",
+      $line,
+      $total,
+      ($total - $same),
+      (($total - $same)/$total),
+      $insert,
+      ($insert/$total),
+      ($stat->mean()),
+      ($stat->median())
+      "\n"
+    );
   }
   $n++;
 }
 close $BED;
 
-my $stat = Statistics::Descriptive::Full->new();
-$stat->add_data(@inserts_dryrun);
+$stat_dryrun->add_data(@isize_dryrun);
 print STDERR "\n\n[INFO] ISIZE mean: ".$stat->mean();
 print STDERR "\n[INFO] ISIZE median: ".$stat->median();
 print STDERR "\n[INFO] ISIZE 5\% and 95\%: ".$stat->percentile(5).", ".$stat->percentile(95);
