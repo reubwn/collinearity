@@ -43,7 +43,7 @@ GetOptions (
   'r|region:s' => \$region,
   'b|bed=s'  => \$bed,
   'g|genome=s' => \$genome,
-  'i|insert:i'  => \$insert,
+  'i|insert:i'  => \$insert_threshold,
   'd|dryrun' => \$dryrun,
   'h|help'   => \$help
   );
@@ -54,7 +54,7 @@ die $usage unless ($bam && $bed && $genome);
 print STDERR "[INFO] BAM file: $bam\n";
 print STDERR "[INFO] Genome file: $genome\n";
 print STDERR "[INFO] Windows file: $bed\n";
-print STDERR "[INFO] ISIZE threshold: $insert\n";
+print STDERR "[INFO] ISIZE threshold: $insert_threshold\n";
 print STDERR "[INFO] Region specified: $region\n" if ($region =~ /.+/);
 print STDERR "[INFO] Dry run, will only calculate ISIZE\n" if ($dryrun);
 print STDOUT join (
@@ -124,8 +124,8 @@ while (my $line = <$BED>) {
       ($total/($window[2]-$window[1])),   #depth average
       ($total - $same),                   #reads mapped to diff scaff
       (($total - $same)/$total),          #proportion
-      $unmapped,
-      ($unmapped/$total),
+      $mate_unmapped,
+      ($mate_unmapped/$total),
       $insert,                            #reads with insert > threshold
       ($insert/$total),                   #proporiotn reads insert > threshold
       $split_reads,
