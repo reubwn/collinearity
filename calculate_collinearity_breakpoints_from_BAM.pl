@@ -31,7 +31,7 @@ USAGE
 
 \n";
 
-my ($bam,$bed,$genome,$dryrun,$help,$debug);
+my ($bam,$bed,$genome,$dryrun,$help);
 my $insert = 500;
 my $region = "";
 my @inserts_dryrun;
@@ -44,9 +44,8 @@ GetOptions (
   'g|genome=s' => \$genome,
   'i|insert:i'  => \$insert,
   'd|dryrun' => \$dryrun,
-  'h|help'   => \$help,
-  'd|debug'  => \$debug
-);
+  'h|help'   => \$help
+  );
 
 die $usage if $help;
 die $usage unless ($bam && $bed && $genome);
