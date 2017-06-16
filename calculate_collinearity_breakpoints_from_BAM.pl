@@ -72,17 +72,17 @@ open (my $BED, $bed) or die "[ERROR] Cannot open $bed: $!\n";
 while (my $window = <$BED>) {
   next unless $window =~ /^$region/;
   chomp($window);
-  #print STDERR "\r[INFO] Working on window \#$n: $window";$| = 1;
+  print STDERR "\r[INFO] Working on window \#$n";$| = 1;
 
   ## print single bed entry to tmp.bed
-  open (my $TMP, ">tmp.bed");
-  print $TMP "$window\n";
-  close $TMP;
+  # open (my $TMP, ">tmp.bed");
+  # print $TMP "$window\n";
+  # close $TMP;
 
   my ($total,$same,$insert,$insert_avg) = (0,0,0,0);
   my @insert_arr;
   $| = 1;
-  open(my $SAM, "samtools view -F1536 -b $bam $region | bedtools intersect -sorted -g $genome -a stdin -b tmp.bed | samtools view - |");#`bedtools intersect -sorted -g $genome -a $bam -b <(printf "$_") | samtools view - | perl -lane 'if($F[6]eq"="){if($F[8]>500){$insert++};$same++;$total++}else{$total++}END{print "$total\t$same\t".($same/$total)."\t$insert\t".($insert/$total)}'`;
+  open(my $SAM, "samtools view -F1536 -b $bam $region | bedtools intersect -sorted -g $genome -a stdin -b <(echo $window) | samtools view - |");#`bedtools intersect -sorted -g $genome -a $bam -b <(printf "$_") | samtools view - | perl -lane 'if($F[6]eq"="){if($F[8]>500){$insert++};$same++;$total++}else{$total++}END{print "$total\t$same\t".($same/$total)."\t$insert\t".($insert/$total)}'`;
   while (<$SAM>) {
     my @F = split (/\s+/, $_);
     if ($dryrun) {
@@ -123,6 +123,7 @@ while (my $window = <$BED>) {
     #   "\n"
     # );
   }
+  $n++;
 }
 close $BED;
 
