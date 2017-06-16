@@ -55,6 +55,7 @@ print STDERR "[INFO] BAM file: $bam\n";
 print STDERR "[INFO] Region specified: $region\n" if ($region =~ /.+/);
 print STDERR "[INFO] Windows file: $bed\n";
 print STDERR "[INFO] Genome file: $genome\n";
+print STDERR "[INFO] Dry run, will only calculate ISIZE\n" if ($dryrun);
 print STDOUT join (
   "\t",
   "CHROM\tSTART\tEND",#$window,
@@ -65,7 +66,7 @@ print STDOUT join (
   "PROP_BIGINSERT",#($insert/$total),
   "INSERT_AVG",#(sum(@insert_arr)/scalar(@insert_arr)),
   "\n"
-);
+) unless ($dryrun);
 
 open (my $BED, $bed) or die "[ERROR] Cannot open $bed: $!\n";
 while (my $window = <$BED>) {
