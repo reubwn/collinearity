@@ -69,7 +69,7 @@ print STDOUT join (
 
 open (my $BED, $bed) or die "[ERROR] Cannot open $bed: $!\n";
 while (my $window = <$BED>) {
-  next $window unless $window =~ /^$region/;
+  next unless $window =~ /^$region/;
   chomp($window);
   print STDERR "\r[INFO] Working on window \#$n: $window";$| = 1;
 
