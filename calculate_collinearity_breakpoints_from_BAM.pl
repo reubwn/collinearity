@@ -114,7 +114,7 @@ while (my $window = <$BED>) {
 }
 close $BED;
 
-$stat = Statistics::Descriptive::Full->new();
+my $stat = Statistics::Descriptive::Full->new();
 $stat->add_data(@inserts_dryrun);
 print STDERR "\n[INFO] ISIZE mean: ".$stat->mean()."\n";
 print STDERR "\n[INFO] ISIZE median: ".$stat->mean()."\n";
