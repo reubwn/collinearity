@@ -104,7 +104,7 @@ while (my $line = <$BED>) {
   close $SAM;
   unless ($dryrun) {
     $stats_hash{
-      'window' => $window,
+      'window' => $line,
       'total'  => $total,
       'diff'   => ($total - $same),
       'prop_diff' => (($total - $same)/$total),
