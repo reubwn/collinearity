@@ -83,7 +83,7 @@ while (my $line = <$BED>) {
 
   my @isize;
   my @window = split (/\s+/, $line); ##split window to get coords
-  my ($total,$same,$insert,$insert_avg,$split_reads,$mate_unmapped) = (0,0,0,0,0,0);
+  my ($total,$same,$insert,$insert_avg,$split_reads,$mate_unmapped,$bases) = (0,0,0,0,0,0,0);
 
   ## select window from SAM
   open(my $SAM, "samtools view -F1536 $bam $window[0]:$window[1]-$window[2] |");
@@ -100,6 +100,7 @@ while (my $line = <$BED>) {
         push (@isize, abs($F[8]));
       }
       $total++; ##total reads in window
+      $bases += length($F[9]); #total bases for looking at depth
       $mate_unmapped++ if ($F[1]&8); ##bitset for mate is unmapped
       $split_reads++ if ($_ =~ m/SA:Z/); ## BWA mem flag for split read
     }
