@@ -83,7 +83,7 @@ while (my $line = <$BED>) {
   my @insert_arr;
   my ($total,$same,$insert,$insert_avg) = (0,0,0,0);
   #open(my $SAM, "samtools view -F1536 -b $bam $region | bedtools intersect -sorted -g $genome -a stdin -b tmp.bed | samtools view - |");
-  open(my $SAM, "samtools view -F1536 -b $bam $window[0]:$window[1]-$window[2]");
+  open(my $SAM, "samtools view -F1536 $bam $window[0]:$window[1]-$window[2] |");
   while (<$SAM>) {
     my @F = split (/\s+/, $_);
     if ($dryrun) {
