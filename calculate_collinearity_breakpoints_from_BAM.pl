@@ -68,24 +68,17 @@ print STDOUT join (
   "\n"
 ) unless ($dryrun);
 
-my $stat = Statistics::Descriptive::Full->new();
-my $stat_dryrun = Statistics::Descriptive::Full->new();
-
 open (my $BED, $bed) or die "[ERROR] Cannot open $bed: $!\n";
 while (my $line = <$BED>) {
   next unless $line =~ /^$region/;
-  print STDERR "\r[INFO] Working on window \#$n";$| = 1;
+  print STDERR "\r[INFO] Working on window \#$n" if ($n % 10 == 0);$| = 1;
   chomp($line);
-  my @window = split (/\s+/, $line);
-
-  ## print single bed entry to tmp.bed
-  # open (my $TMP, ">tmp.bed");
-  # print $TMP "$window\n";
-  # close $TMP;
 
   my @isize;
+  my @window = split (/\s+/, $line); ##split window to get coords
   my ($total,$same,$insert,$insert_avg) = (0,0,0,0);
-  #open(my $SAM, "samtools view -F1536 -b $bam $region | bedtools intersect -sorted -g $genome -a stdin -b tmp.bed | samtools view - |");
+
+  ## select window from SAM
   open(my $SAM, "samtools view -F1536 $bam $window[0]:$window[1]-$window[2] |");
   while (<$SAM>) {
     my @F = split (/\s+/, $_);
@@ -134,9 +127,10 @@ while (my $line = <$BED>) {
 }
 close $BED;
 
+my $stat_dryrun = Statistics::Descriptive::Full->new();
 $stat_dryrun->add_data(@isize_dryrun);
-print STDERR "\n\n[INFO] ISIZE mean: ".$stat->mean();
-print STDERR "\n[INFO] ISIZE median: ".$stat->median();
-print STDERR "\n[INFO] ISIZE 5\% and 95\%: ".$stat->percentile(5).", ".$stat->percentile(95);
+print STDERR "\n\n[INFO] ISIZE mean: ".$stat_dryrun->mean();
+print STDERR "\n[INFO] ISIZE median: ".$stat_dryrun->median();
+print STDERR "\n[INFO] ISIZE 5\% and 95\%: ".$stat_dryrun->percentile(5).", ".$stat_dryrun->percentile(95);
 
 print STDERR "\n[INFO] Finished on ".`date`."\n";
