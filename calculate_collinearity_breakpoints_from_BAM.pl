@@ -34,6 +34,7 @@ USAGE
 my ($bam,$bed,$genome,$dryrun,$help);
 my $insert = 500;
 my $region = "";
+my %stats_hash;
 my @inserts_dryrun;
 my $n = 1;
 
@@ -71,7 +72,7 @@ open (my $BED, $bed) or die "[ERROR] Cannot open $bed: $!\n";
 while (my $window = <$BED>) {
   next unless $window =~ /^$region/;
   chomp($window);
-  print STDERR "\r[INFO] Working on window \#$n: $window";$| = 1;
+  #print STDERR "\r[INFO] Working on window \#$n: $window";$| = 1;
 
   ## print single bed entry to tmp.bed
   open (my $TMP, ">tmp.bed");
@@ -80,6 +81,7 @@ while (my $window = <$BED>) {
 
   my ($total,$same,$insert,$insert_avg) = (0,0,0,0);
   my @insert_arr;
+  $| = 1;
   open(my $SAM, "samtools view -F1536 -b $bam $region | bedtools intersect -sorted -g $genome -a stdin -b tmp.bed | samtools view - |");#`bedtools intersect -sorted -g $genome -a $bam -b <(printf "$_") | samtools view - | perl -lane 'if($F[6]eq"="){if($F[8]>500){$insert++};$same++;$total++}else{$total++}END{print "$total\t$same\t".($same/$total)."\t$insert\t".($insert/$total)}'`;
   while (<$SAM>) {
     my @F = split (/\s+/, $_);
@@ -100,17 +102,26 @@ while (my $window = <$BED>) {
   }
   close $SAM;
   unless ($dryrun) {
-    print STDOUT join (
-      "\t",
-      $window,
-      $total,
-      ($total - $same),
-      (($total - $same)/$total),
-      $insert,
-      ($insert/$total),
-      (sum(@insert_arr)/scalar(@insert_arr)),
-      "\n"
-    );
+    $stats_hash{
+      'window' => $window,
+      'total'  => $total,
+      'diff'   => ($total - $same),
+      'prop_diff' => (($total - $same)/$total),
+      'biginsert' => $insert,
+      'prop_biginsert' => ($insert/$total),
+      'insert_avg' => (sum(@insert_arr)/scalar(@insert_arr))
+    };
+    # print STDOUT join (
+    #   "\t",
+    #   $window,
+    #   $total,
+    #   ($total - $same),
+    #   (($total - $same)/$total),
+    #   $insert,
+    #   ($insert/$total),
+    #   (sum(@insert_arr)/scalar(@insert_arr)),
+    #   "\n"
+    # );
   }
 }
 close $BED;
