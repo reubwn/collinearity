@@ -107,34 +107,29 @@ while (my $line = <$BED>) {
   }
   close $SAM;
   unless ($dryrun) {
-    # $stats_hash{
-    #   'window' => $line,
-    #   'total'  => $total,
-    #   'diff'   => ($total - $same),
-    #   'prop_diff' => (($total - $same)/$total),
-    #   'biginsert' => $insert,
-    #   'prop_biginsert' => ($insert/$total),
-    #   'insert_avg' => (sum(@insert_arr)/scalar(@insert_arr))
-    # };
-    my $stat = Statistics::Descriptive::Full->new();
-    $stat->add_data(@isize);
-    print STDOUT join (
-      "\t",
-      $line,                              #window
-      $total,                             #total reads
-      ($bases/($window[2]-$window[1])),   #depth average
-      ($total - $same),                   #reads mapped to diff scaff
-      (($total - $same)/$total),          #proportion
-      $mate_unmapped,
-      ($mate_unmapped/$total),
-      $insert,                            #reads with insert > threshold
-      ($insert/$total),                   #proporiotn reads insert > threshold
-      $split_reads,
-      ($split_reads/$total),
-      ($stat->mean()),
-      ($stat->median()),
-      "\n"
-    );
+    unless ($total == 0) {
+      my $stat = Statistics::Descriptive::Full->new();
+      $stat->add_data(@isize);
+      print STDOUT join (
+        "\t",
+        $line,                              #window
+        $total,                             #total reads
+        ($bases/($window[2]-$window[1])),   #depth average
+        ($total - $same),                   #reads mapped to diff scaff
+        (($total - $same)/$total),          #proportion
+        $mate_unmapped,
+        ($mate_unmapped/$total),
+        $insert,                            #reads with insert > threshold
+        ($insert/$total),                   #proporiotn reads insert > threshold
+        $split_reads,
+        ($split_reads/$total),
+        ($stat->mean()),
+        ($stat->median()),
+        "\n"
+      );
+    } else { ##if there are zero reads eg window covers a scaffolded NNN region
+      print STDOUT join ("\t", $line,"0","0","0","0","0","0","0","0","0","0","0","0","\n");
+    }
   }
   $n++;
 }
