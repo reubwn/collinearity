@@ -117,8 +117,8 @@ close $BED;
 
 my $stat = Statistics::Descriptive::Full->new();
 $stat->add_data(@inserts_dryrun);
-print STDERR "\n[INFO] ISIZE mean: ".$stat->mean()."\n";
-print STDERR "\n[INFO] ISIZE median: ".$stat->mean()."\n";
-print STDERR "\n[INFO] ISIZE 5\% and 95\%: ".$stat->percentile(5).", ".$stat->percentile(95)."\n";
+print STDERR "\n\n[INFO] ISIZE mean: ".$stat->mean();
+print STDERR "\n[INFO] ISIZE median: ".$stat->median();
+print STDERR "\n[INFO] ISIZE 5\% and 95\%: ".$stat->percentile(5).", ".$stat->percentile(95);
 
 print STDERR "\n[INFO] Finished on ".`date`."\n";
