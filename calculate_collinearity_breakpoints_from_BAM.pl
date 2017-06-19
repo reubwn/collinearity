@@ -110,6 +110,9 @@ while (my $line = <$BED>) {
     unless ($total == 0) {
       my $stat = Statistics::Descriptive::Full->new();
       $stat->add_data(@isize);
+      my ($mean,$median)=(0,0);
+      $mean = $stat->mean() if defined($stat->mean());
+      $median = $stat->median() if defined($stat->median());
       print STDOUT join (
         "\t",
         $line,                              #window
@@ -123,8 +126,8 @@ while (my $line = <$BED>) {
         ($insert/$total),                   #proporiotn reads insert > threshold
         $split_reads,
         ($split_reads/$total),
-        ($stat->mean()),
-        ($stat->median()),
+        $mean,
+        $median,
         "\n"
       );
     } else { ##if there are zero reads eg window covers a scaffolded NNN region
