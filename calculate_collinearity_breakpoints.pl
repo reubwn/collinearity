@@ -21,7 +21,6 @@ OPTIONS
 
 USAGE
   calculate_collinearity_breakpoints.pl -i Xyz.collinearity.kaks.score -k 0.5
-
 \n";
 
 my ($scorefile,$help,$debug);
@@ -36,7 +35,7 @@ GetOptions (
 
 die $usage if $help;
 die $usage unless ($scorefile);
-die "[ERROR] Hmm, suspicious lack of \*.score on $scorefile... is this the right file?\n\n";
+die "$usage\n[ERROR] Hmm, suspicious lack of \*.score on $scorefile... is this the right file?\n\n" unless ($scorefile =~ /score$/);
 
 print STDERR "[INFO] Collinearity file: $scorefile\n";
 print STDERR "[INFO] Ks threshold: $ks\n";
