@@ -15,19 +15,21 @@ OPTIONS:
   -i|--collinearity [FILE]   : collinearity file from MCScanX
   -s|--search       [STRING] : chromosome / scaffold name to get connections for
   -a|--all                   : fetch all downstream connections as well
+  -r|--regex                 : apply regex to output
   -h|--help                  : print this message
 
 USAGE:
   >> get_all_connections_from_collinarity.pl -i xyz.collinearity -s Ar1 --all
 \n";
 
-my ($collinearity, $search, $all, $help);
+my ($collinearity, $search, $all, $regex, $help);
 
 GetOptions (
-  'collinearity|i=s' => \$collinearity,
-  'search|s=s'       => \$search,
-  'all|a'            => \$all,
-  'help|h'           => \$help,
+  'i|collinearity=s' => \$collinearity,
+  's|search=s'       => \$search,
+  'a|all'            => \$all,
+  'r|regex'          => \$regex,
+  'h|help'           => \$help,
 );
 
 die $usage if $help;
@@ -55,6 +57,16 @@ if ($all) {
 }
 
 my @uniq_result = uniq(@result);
-print join (",", (nsort @uniq_result)), "\n";
+if ($regex) {
+  foreach (@uniq_result) {
+    if ($_ =~ m/(\d+)/) {
+      my $num = sprintf("%05d", $1);
+      $_ = "ARIC$num";
+    }
+  }
+  print join (";", (nsort @uniq_result)), "\n"; ##eg for circos chromosomes
+} else {
+  print join (",", (nsort @uniq_result)), "\n";
+}
 
 __END__

@@ -14,7 +14,7 @@ SYNOPSIS
 OUTPUT
 
 OPTIONS
-  -i|--in [FILE] : collinearity score file (annotated with Ks)
+  -i|--in [FILE] : REORDERED collinearity score file (annotated with Ks)
   -k|--ks        : only examine blocks with Ks <= this threshold
   -o|--out       : outfile (default=INFILE.breaks)
   -h|--help      : print this message
@@ -35,7 +35,7 @@ GetOptions (
 
 die $usage if $help;
 die $usage unless ($scorefile);
-die "$usage\n[ERROR] Hmm, suspicious lack of \*.score on $scorefile... is this the right file?\n\n" unless ($scorefile =~ /score$/);
+#die "$usage\n[ERROR] Hmm, suspicious lack of \*.score on $scorefile... is this the right file?\n\n" unless ($scorefile =~ /score$/);
 
 print STDERR "[INFO] Collinearity file: $scorefile\n";
 print STDERR "[INFO] Ks threshold: $ks\n";
@@ -49,7 +49,9 @@ while (<$IN>) {
   if ($F[11] <= $ks) { ##only select homologs with Ks < some threshold
     $chroms1{$F[0]} = $F[1]; ##key= blockname; val=chrom where block exists
     push ( @{$blocks1{$F[1]}}, $F[0] ); ##key=chrom1 name; val= @{ blocks on chrom1 name }
+    push ( @{$blocks1{$F[2]}}, $F[0] ); ##key=chrom1 name; val= @{ blocks on chrom1 name }
     $chroms2{$F[0]} = $F[2]; ##key= blockname; val=chrom where block exists
+    push ( @{$blocks2{$F[1]}}, $F[0] ); ##key=chrom2 name; val= @{ blocks on chrom2 name }
     push ( @{$blocks2{$F[2]}}, $F[0] ); ##key=chrom2 name; val= @{ blocks on chrom2 name }
   }
 }
