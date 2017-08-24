@@ -10,6 +10,10 @@ use Statistics::Descriptive;
 use Sort::Naturally;
 
 my $usage = "
+
+WARNING ***
+  This script is still under development - use at your own risk!
+
 SYNOPSIS
   Calculates some statistics for sliding windows across a BAM file which can inform the presence of collinearity breakpoints
 
