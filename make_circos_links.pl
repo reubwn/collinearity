@@ -67,8 +67,8 @@ if ($breaksfile) {
     chomp;
     my @F = split (/\s+/, $_);
     if ($F[-1] =~ "break") {
-      $breaks_hash{$F[0]}{CHROM1} = $F[1];
-      $breaks_hash{$F[0]}{CHROM2} = $F[3];
+      $breaks_hash{$F[2]}{CHROM1} = $F[0];
+      $breaks_hash{$F[2]}{CHROM2} = $F[4];
     }
   }
 }

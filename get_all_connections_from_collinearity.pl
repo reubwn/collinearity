@@ -16,19 +16,21 @@ OPTIONS:
   -s|--search       [STRING] : chromosome / scaffold name to get connections for
   -a|--all                   : fetch all downstream connections as well
   -r|--regex                 : apply regex to output
+  -p|--prefix                : add this prefix to regex
   -h|--help                  : print this message
 
 USAGE:
   >> get_all_connections_from_collinarity.pl -i xyz.collinearity -s Ar1 --all
 \n";
 
-my ($collinearity, $search, $all, $regex, $help);
+my ($collinearity, $search, $all, $regex, $prefix, $help);
 
 GetOptions (
   'i|collinearity=s' => \$collinearity,
   's|search=s'       => \$search,
   'a|all'            => \$all,
   'r|regex'          => \$regex,
+  'p|prefix:s'       => \$prefix,
   'h|help'           => \$help,
 );
 
@@ -61,7 +63,7 @@ if ($regex) {
   foreach (@uniq_result) {
     if ($_ =~ m/(\d+)/) {
       my $num = sprintf("%05d", $1);
-      $_ = "ARIC$num";
+      $_ = $prefix.$num;
     }
   }
   print join (";", (nsort @uniq_result)), "\n"; ##eg for circos chromosomes
