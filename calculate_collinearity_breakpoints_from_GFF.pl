@@ -23,10 +23,44 @@ SYNOPSIS
     -k|--ks     [FLOAT] : Ks threshold to define homologous block (default <= 0.5)
     -o|--out            : outfile (default=INFILE.breaks)
     -b|--blocks         : also print blocks_per_gene file (default=no)
-    -h|--help           : print this message
+    -h|--help           : print help
+    -m|--morehelp       : print more help
 
   USAGE
     calculate_collinearity_breakpoints.pl -i Xy.collinearity.kaks.reformatted -g Xy.gff -s Xy.collinearity.kaks.score
+\n";
+
+my $definitions = "
+BREAKPOINT DEFINITION
+  A collinearity break is introduced if there is a mistmatch in the identity of the upstream
+  or downstream homologous blocks from one collinear region to another. Thus, if a[i] is the identity of the focal block on chrom a,
+  homologous with block b[j] on chrom b, collinearity is broken if a[i+/-1] != b[j+/-1]. A caveat is when the focal block is located
+  at the terminus of a scaffold - here, collinearity is not broken if the homologous scaffold can be orientated 'away' from the focal scaffold
+
+EXAMPLES
+  SUBJECT is SINGLETON
+    a----1--2-----3-4----5---
+    b     --2---
+  a and b are inferred collinear, since b contains only 1 block
+
+  FOCAL and SUBJECT are TERMINAL
+    a----1--2-----3-4----5---
+    c                 ---5---6--7--8--
+  a and c are collinear, since orientation of scaffolds WRT each other is unknown and may align as shown
+
+  FOCAL or SUBJECT are TERMINAL
+    a----1--2-----3-4----5---
+    d              -4--10-11----12---
+  a and d show a break in collinearity, since i=4, a[4+1]=5, but b[j+1]=10, and similarly a[i-1]=2 but still cannot align with b if orientated in the other direction
+
+  neither FOCAL or SUBJECT are TERMINAL
+    a----1--2-----3-4----5---
+    e  18---2--19-20----21-----
+  a and e are clearly not collinear
+
+RULES
+  (1) collinearity cannot be broken by scaffolds containing only 1 collinear block.
+  (2) collinearity cannot be broken when focal and subject blocks are BOTH terminal on their respective scaffolds
 \n";
 
 my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$verbose);
@@ -43,6 +77,7 @@ GetOptions (
 );
 
 die $usage if $help;
+die "$usage.$definitions" if $morehelp;
 die $usage unless ($collinearityfile && $gfffile && $scorefile);
 
 print STDERR "[INFO] Collinearity file: $collinearityfile\n";
@@ -143,7 +178,7 @@ while (<$PAINTED>) {
 }
 close $PAINTED;
 
-open (my $OUT2, ">$gfffile.breaks") or die $!;
+open (my $OUT2, ">$gfffile.sorted.painted.breaks") or die $!;
 print $OUT2 join ("\t",
                  "A.CHROM",
                  "A.BLOCKS",
@@ -242,10 +277,10 @@ foreach my $chrom (nsort keys %gff_hash) {
 }
 close $OUT2;
 
-print STDERR "[INFO] Total blocks: ".commify($total_blocks)."\n";
 print STDERR "[INFO] Number of collinear blocks: ".commify($collinear_blocks)." (".percentage($collinear_blocks,$total_blocks).")\n";
 print STDERR "[INFO] Number of noncollinear blocks: ".commify($noncollinear_blocks)." (".percentage($noncollinear_blocks,$total_blocks).")\n";
 print STDERR "[INFO] Number of collinearity breaks: ".($noncollinear_blocks/2)."\n";
+print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
 ############################# subs
