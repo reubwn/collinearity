@@ -207,7 +207,7 @@ foreach my $chrom (nsort keys %gff_hash) {
 
     $i++ until $all_chroms_per_block[$i] eq $chrom; ## get index of focal chrom
     splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
-    if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
+    if (@all_chroms_per_block != 2) {
       print STDERR "[INFO] Chromosomes shared by block $focal_block are the same! @all_chroms_per_block\n";
       next BLOCK;
     }
