@@ -172,7 +172,7 @@ while (<$PAINTED>) {
   if ($F[4] =~ /\-/) {
     next;
   } else {
-    push ( @{ $blocks_hash{$F[4]} }, $F[0]) unless $seen{$F[0]}{$F[4]}; ##key= block, val= @[chroms involved in block]
+    push ( @{ $blocks_hash{$F[4]} }, $F[0]);# unless $seen{$F[0]}{$F[4]}; ##key= block, val= @[chroms involved in block]
     push ( @{ $gff_hash{$F[0]} }, $F[4] ) unless $seen{$F[0]}{$F[4]}; ##key= chrom, val= @[order of blocks along chrom]
     $seen{$F[0]}{$F[4]}++;
   }
@@ -206,14 +206,14 @@ foreach my $chrom (nsort keys %gff_hash) {
     my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
     $i++ until $all_chroms_per_block[$i] eq $chrom; ## get index of focal chrom
     splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
-    if (scalar(@all_chroms_per_block) != 2) {
-      print STDERR "[INFO] Chromosomes shared by block $focal_block are the same! @all_chroms_per_block\n";
-      next BLOCK;
+
+    if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
+      print STDERR "$focal_block: @all_chroms_per_block\n";
     }
 
     my @blocks2 = @{$gff_hash{$all_chroms_per_block[0]}} if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
-    my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on same chrom
-    my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom
+    my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on focal chrom
+    my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom2
 
     if ( ("@blocks1" =~ "@blocks2") || ("@blocks1" =~ join (" ", reverse(@blocks2))) ) {
       $description = "B subset of A";
