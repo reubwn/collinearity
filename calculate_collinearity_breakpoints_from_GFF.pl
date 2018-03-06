@@ -94,8 +94,9 @@ while (<$COLL>) {
 close $COLL;
 print STDERR "[INFO] Parsed ".scalar(keys %collinearity_hash)." genes from $collinearityfile\n";
 
+my $GENES;
 if ($blockspergenefile){
-  open (my $GENES, ">$gfffile.blocks_per_gene") or die $!;
+  open ($GENES, ">$gfffile.blocks_per_gene") or die $!;
 }
 
 foreach my $gene (nsort keys %collinearity_hash) {
@@ -106,8 +107,7 @@ foreach my $gene (nsort keys %collinearity_hash) {
 }
 close $GENES if ($blockspergenefile);
 
-open (my $PAINTED, ">$gfffile.painted") or die $!;
-
+open (my $OUT1, ">$gfffile.painted") or die $!;
 open (my $GFF, $gfffile) or die $!;
 while (<$GFF>) {
   chomp;
@@ -117,15 +117,15 @@ while (<$GFF>) {
     if (scalar(@blocks)>1) {
       print STDERR "[WARN] Gene $F[1] has >1 homologous block: @blocks\n" if $verbose;
     } else {
-      print $PAINTED join ("\t", @F, @blocks, "\n");
+      print $OUT1 join ("\t", @F, @blocks, "\n");
       $seen{$blocks[0]}++;
     }
   } else {
-    print $OUT join ("\t", @F, "-", "\n");
+    print $OUT1 join ("\t", @F, "-", "\n");
   }
 }
 close $GFF;
-close $PAINTED;
+close $OUT1;
 
 ## reopen PAINTED GFF file:
 open (my $PAINTED, "$gfffile.painted") or die $!;
@@ -142,8 +142,8 @@ while (<$PAINTED>) {
 }
 close $PAINTED;
 
-open (my $OUT, ">$gfffile.breaks") or die $!;
-print $OUT join ("\t",
+open (my $OUT2, ">$gfffile.breaks") or die $!;
+print $OUT2 join ("\t",
                  "A.CHROM",
                  "A.BLOCKS",
                  "FOCAL",
@@ -229,17 +229,17 @@ foreach my $chrom (nsort keys %gff_hash) {
           }
     }
 
-    print $OUT "$chrom\t";
-    print $OUT join ("|", @blocks1);
-    print $OUT "\t$focal_block\t";
-    print $OUT join ("|", @{$blocks_hash{$focal_block}});
-    print $OUT "\t@arr\t";
-    print $OUT join ("|", @blocks2) if (defined($arr[0]));
-    print $OUT "\t$description\t$result\n";
+    print $OUT2 "$chrom\t";
+    print $OUT2 join ("|", @blocks1);
+    print $OUT2 "\t$focal_block\t";
+    print $OUT2 join ("|", @{$blocks_hash{$focal_block}});
+    print $OUT2 "\t@arr\t";
+    print $OUT2 join ("|", @blocks2) if (defined($arr[0]));
+    print $OUT2 "\t$description\t$result\n";
     $total_blocks++;
   }
 }
-close $OUT;
+close $OUT2;
 
 print STDERR "[INFO] Total blocks: ".commify($total_blocks)."\n";
 print STDERR "[INFO] Number of collinear blocks: ".commify($collinear_blocks)." (".percentage($collinear_blocks,$total_blocks).")\n";
