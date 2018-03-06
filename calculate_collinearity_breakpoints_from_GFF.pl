@@ -200,20 +200,19 @@ foreach my $chrom (nsort keys %gff_hash) {
     my $description = "NULL";
     my $result = "collinear";
 
+    ## get identity of chrom2 (ie, non-focal chrom linked to focal chrom via block)
+    ## prob better way to do this but...
     my $i = 0;
-    my @arr = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block
-    print STDERR "$chrom\n";
-    print STDERR "@arr\n";
-    $i++ until $arr[$i] eq $chrom;
-    print STDERR "$i\n";
-    splice(@arr, $i, 1);
-    print STDERR "@arr\n";
+    my @arr = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2
+    $i++ until $arr[$i] eq $chrom; ## get index of focal chrom
+    splice(@arr, $i, 1); ## splice focal chrom from array, leaving chrom shared by block
+    my @blocks2 = @{$gff_hash{$arr[0]}} if (defined($arr[0])); ## get all blocks on chrom2
 
-    my @blocks2 = @{$gff_hash{$arr[0]}} if (defined($arr[0]));
-    print STDERR "@blocks2\n\n";
+    if ($chrom eq $arr[0]) {
+      print STDERR "[INFO] $chrom and $arr[0] are the same chrom!\n"''
+    }
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on same chrom
     my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom
-    #print STDERR "$chrom, $index1\n" unless ($index2);
 
     if ( ("@blocks1" =~ "@blocks2") || ("@blocks1" =~ join (" ", reverse(@blocks2))) ) {
       $description = "B subset of A";
