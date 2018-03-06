@@ -9,7 +9,11 @@ use List::MoreUtils qw /pairwise/;
 use Sort::Naturally;
 
 my $usage = "
+INFO
+  Obsoleted by calculate_collinearity_breakpoints_GFF.pl
+
 SYNOPSIS
+  Prints block number participation for all genes based on Ks threshold in new column of GFF
 
 OPTIONS
   -i|--in     [FILE]  : collinearity file (REFORMATTED ONLY)
@@ -20,7 +24,7 @@ OPTIONS
   -h|--help           : print this message
 
 USAGE
-  paint_gff.pl -i Xy.collinearity -g Xy.gff -s Xy.collinearity.kaks.score
+  paint_gff.pl -i Xy.collinearity.kaks.reformatted -g Xy.gff -s Xy.collinearity.kaks.score
 \n";
 
 my ($collinearityfile,$gfffile,$scorefile,$help,$verbose);
@@ -76,40 +80,26 @@ foreach my $gene (nsort keys %collinearity_hash) {
 }
 close $GENES;
 
-# foreach my $gene (nsort keys %homologous_blocks_hash) {
-#   print "$gene\t@{$homologous_blocks_hash{$gene}}\n";
-# }
 
 open (my $OUT, ">$gfffile.painted") or die $!;
 open (my $ORDER, ">$scorefile.reordered") or die $!;
 print $ORDER "block_num\tchrom1\tchrom2\tcollinear_genes\ttotal_genes1\ttotal_genes2\torientation\tscore_block1\tscore_block2\tscore_avg\tka_avg\tks_avg\n";
 open (my $GFF, $gfffile) or die $!;
+
 while (<$GFF>) {
   chomp;
   my @F = split (/\s+/, $_);
-  #print $F[1]."\n";
   if (exists($homologous_blocks_hash{$F[1]})) {
     my @blocks = @{$homologous_blocks_hash{$F[1]}}; ## all homologous blocks for that gene; should be 1 but sometimes more
     if (scalar(@blocks)>1) {
       print STDERR "[WARN] Gene $F[1] has >1 homologous block: @blocks\n" if $verbose;
     } else {
-      print $OUT join (
-        "\t",
-        @F,
-        @blocks,
-        "\n"
-      );
+      print $OUT join ("\t", @F, @blocks, "\n");
       print $ORDER "$score_file_hash{$blocks[0]}\n" unless exists($seen{$blocks[0]}); ##print once?
       $seen{$blocks[0]}++;
-      #print "$score_file_hash{$blocks[0]}\n" if $F[0] =~ "ARIC00010";
     }
   } else {
-    print $OUT join (
-      "\t",
-      @F,
-      "-",
-      "\n"
-    );
+    print $OUT join ("\t", @F, "-", "\n");
   }
 }
 close $GFF;

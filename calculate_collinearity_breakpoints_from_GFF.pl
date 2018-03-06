@@ -11,39 +11,125 @@ use Sort::Naturally;
 
 my $usage = "
 SYNOPSIS
-  Given a sorted GFF annotated with block participation, will search for breaks
-  in collinearity defined as occurrences where homologous blocks cannot be
-  aligned along scaffolds without some rearrangement
+  Searches for breaks in collinearity defined as occurrences where homologous
+  blocks cannot be aligned along scaffolds without some rearrangement
 
-OPTIONS
-  -g|--gff [FILE] : painted GFF file annotated with block membership
-  -o|--out        : outfile (default=INFILE.breaks)
-  -h|--help       : print this message
+  Uses GNU 'sort' to presort GFF file.
 
-USAGE
-  calculate_collinearity_breakpoints.pl -g Xyz.gff.painted
+  OPTIONS
+    -i|--in     [FILE]  : collinearity file (use .reformatted!)
+    -g|--gff    [FILE]  : GFF file
+    -s|--score  [FILE]  : score file with average Ks per block
+    -k|--ks     [FLOAT] : Ks threshold to define homologous block (default <= 0.5)
+    -o|--out            : outfile (default=INFILE.breaks)
+    -b|--blocks         : also print blocks_per_gene file (default=no)
+    -h|--help           : print this message
+
+  USAGE
+    calculate_collinearity_breakpoints.pl -i Xy.collinearity.kaks.reformatted -g Xy.gff -s Xy.collinearity.kaks.score
 \n";
 
-my ($scorefile,$gfffile,$help);
+my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$verbose);
 my $ks = 0.5;
 
 GetOptions (
-  'gff|g=s'          => \$gfffile,
-  'help|h'           => \$help
+  'i|collinearity=s' => \$collinearityfile,
+  'g|gff=s'          => \$gfffile,
+  's|score=s'        => \$scorefile,
+  'b|blocks'         => \$blockspergenefile,
+  'k|ks:f'           => \$ks,
+  'v|verbose'        => \$verbose,
+  'h|help'           => \$help
 );
 
 die $usage if $help;
-die $usage unless ($gfffile);
+die $usage unless ($collinearityfile && $gfffile && $scorefile);
 
-#print STDERR "[INFO] Collinearity file: $scorefile\n";
-print STDERR "[INFO] Painted GFF file: $gfffile\n";
-#print STDERR "[INFO] Ks threshold: $ks\n";
+print STDERR "[INFO] Collinearity file: $collinearityfile\n";
+print STDERR "[INFO] GFF file: $gfffile\n";
+print STDERR "[INFO] Score file: $scorefile\n";
+print STDERR "[INFO] Ks threshold: $ks\n";
 
-my (%gff_hash, %blocks_hash, %seen);
+## die unless refomatted collinearity file:
+unless ($collinearityfile =~ m/refomatted$/) {
+  die "[ERROR] Collinearity file: $collinearityfile is not reformatted\n";
+}
+
+## things we'll need:
+my (%collinearity_hash, %homologous_blocks_hash, %score_hash, %score_file_hash, %gff_hash, %blocks_hash, %seen);
 my ($collinear_blocks, $noncollinear_blocks, $total_blocks) = (0,0,0);
+
+## sort GFF file:
+if (system("sort -k1,1 -k3,3 -V $gfffile > $gfffile.sorted") != 0) {
+  die "[ERROR] Something up with GNU sort\n";
+} else {
+  print STDERR "[INFO] Sorted GFF file: $gfffile.sorted\n";
+}
+
+## get blockwise average Ks and scores:
+open (my $SCORE, $scorefile) or die $!;
+while (<$SCORE>) {
+  chomp;
+  my @F = split (/\s+/, $_);
+  $score_hash{$F[0]}{SCORE} = $F[9];
+  $score_hash{$F[0]}{Ka} = $F[10];
+  $score_hash{$F[0]}{Ks} = $F[11];
+  $score_file_hash{$F[0]} = $_; ##file hash
+}
+close $SCORE;
+
+## get genewise block participation:
+open (my $COLL, $collinearityfile) or die $!;
+while (<$COLL>) {
+  chomp;
+  if ($_ =~ /^#/) {
+    next;
+  } else {
+    my @F = split (/\s+/, $_);
+    ## key= gene name; val= @{all blocks that gene is a member of}
+    push ( @{$collinearity_hash{$F[2]}}, $F[0] );
+    push ( @{$collinearity_hash{$F[3]}}, $F[0] );
+  }
+}
+close $COLL;
+print STDERR "[INFO] Parsed ".scalar(keys %collinearity_hash)." genes from $collinearityfile\n";
+
+if ($blockspergenefile){
+  open (my $GENES, ">$gfffile.blocks_per_gene") or die $!;
+}
+
+foreach my $gene (nsort keys %collinearity_hash) {
+  print $GENES "$gene\t@{$collinearity_hash{$gene}}\n" if ($blockspergenefile);
+  foreach my $block (@{$collinearity_hash{$gene}}) {
+    push ( @{$homologous_blocks_hash{$gene}}, $block ) if $score_hash{$block}{Ks} <= $ks; ## %homologous_blocks_hash contains ONLY homologous blocks with Ks <= threshold
+  }
+}
+close $GENES if ($blockspergenefile);
+
+open (my $PAINTED, ">$gfffile.painted") or die $!;
 
 open (my $GFF, $gfffile) or die $!;
 while (<$GFF>) {
+  chomp;
+  my @F = split (/\s+/, $_);
+  if (exists($homologous_blocks_hash{$F[1]})) {
+    my @blocks = @{$homologous_blocks_hash{$F[1]}}; ## all homologous blocks for that gene; should be 1 but sometimes more
+    if (scalar(@blocks)>1) {
+      print STDERR "[WARN] Gene $F[1] has >1 homologous block: @blocks\n" if $verbose;
+    } else {
+      print $PAINTED join ("\t", @F, @blocks, "\n");
+      $seen{$blocks[0]}++;
+    }
+  } else {
+    print $OUT join ("\t", @F, "-", "\n");
+  }
+}
+close $GFF;
+close $PAINTED;
+
+## reopen PAINTED GFF file:
+open (my $PAINTED, "$gfffile.painted") or die $!;
+while (<$PAINTED>) {
   chomp;
   my @F = split (/\s+/, $_);
   if ($F[4] =~ /\-/) {
@@ -54,8 +140,7 @@ while (<$GFF>) {
     $seen{$F[0]}{$F[4]}++;
   }
 }
-close $GFF;
-#print STDERR "[INFO] Total chroms with blocks: ".scalar(keys %gff_hash)."\n";
+close $PAINTED;
 
 open (my $OUT, ">$gfffile.breaks") or die $!;
 print $OUT join ("\t",
@@ -70,6 +155,7 @@ print $OUT join ("\t",
                  "\n"
                 );
 
+## main code for detecting breakpoints:
 foreach my $chrom (nsort keys %gff_hash) {
   my @blocks1 = @{$gff_hash{$chrom}};
 
