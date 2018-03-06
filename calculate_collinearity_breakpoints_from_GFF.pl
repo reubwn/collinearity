@@ -194,16 +194,19 @@ print $OUT2 join ("\t",
 
 ## main code for detecting breakpoints:
 foreach my $chrom (nsort keys %gff_hash) {
-  my @blocks1 = @{$gff_hash{$chrom}};
+  my @blocks1 = @{$gff_hash{$chrom}}; ## array of blocks along chrom
 
   foreach my $focal_block (@blocks1) {
     my $description = "NULL";
     my $result = "collinear";
 
     my $i = 0;
-    my @arr = @{$blocks_hash{$focal_block}};
+    my @arr = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block
+    print STDERR "@arr\n";
     $i++ until $arr[$i] eq $chrom;
+    print STDERR "$i\n";
     splice(@arr, $i, 1);
+    print STDERR "@arr\n";
 
     my @blocks2 = @{$gff_hash{$arr[0]}} if (defined($arr[0]));
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on same chrom
