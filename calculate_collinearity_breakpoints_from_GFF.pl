@@ -128,7 +128,7 @@ while (<$COLL>) {
   }
 }
 close $COLL;
-print STDERR "[INFO] Parsed ".scalar(keys %collinearity_hash)." genes from $collinearityfile\n";
+print STDERR "[INFO] Parsed ".commify(scalar(keys %collinearity_hash))." genes from $collinearityfile\n";
 
 my $GENES;
 if ($blockspergenefile){
