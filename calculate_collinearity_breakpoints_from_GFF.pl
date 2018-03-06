@@ -209,6 +209,7 @@ foreach my $chrom (nsort keys %gff_hash) {
     print STDERR "@arr\n";
 
     my @blocks2 = @{$gff_hash{$arr[0]}} if (defined($arr[0]));
+    print STDERR "@blocks2\n\n";
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on same chrom
     my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom
     #print STDERR "$chrom, $index1\n" unless ($index2);
