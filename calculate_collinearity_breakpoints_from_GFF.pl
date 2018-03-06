@@ -211,7 +211,7 @@ foreach my $chrom (nsort keys %gff_hash) {
       print STDERR "[INFO] Chromosomes shared by block $focal_block are the same! @all_chroms_per_block\n";
       next BLOCK;
     }
-    
+
     my @blocks2 = @{$gff_hash{$all_chroms_per_block[0]}} if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on same chrom
     my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom
@@ -277,8 +277,8 @@ foreach my $chrom (nsort keys %gff_hash) {
     print $OUT2 join ("|", @blocks1);
     print $OUT2 "\t$focal_block\t";
     print $OUT2 join ("|", @{$blocks_hash{$focal_block}});
-    print $OUT2 "\t@arr\t";
-    print $OUT2 join ("|", @blocks2) if (defined($arr[0]));
+    print $OUT2 "\t@all_chroms_per_block\t";
+    print $OUT2 join ("|", @blocks2) if (defined($all_chroms_per_block[0]));
     print $OUT2 "\t$description\t$result\n";
     $total_blocks++;
   }
