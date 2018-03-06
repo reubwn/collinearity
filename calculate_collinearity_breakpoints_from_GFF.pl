@@ -107,8 +107,9 @@ foreach my $gene (nsort keys %collinearity_hash) {
 }
 close $GENES if ($blockspergenefile);
 
-open (my $OUT1, ">$gfffile.painted") or die $!;
-open (my $GFF, $gfffile) or die $!;
+## add block participation to sorted GFF:
+open (my $OUT1, ">$gfffile.sorted.painted") or die $!;
+open (my $GFF, "$gfffile.sorted") or die $!;
 while (<$GFF>) {
   chomp;
   my @F = split (/\s+/, $_);
@@ -128,7 +129,7 @@ close $GFF;
 close $OUT1;
 
 ## reopen PAINTED GFF file:
-open (my $PAINTED, "$gfffile.painted") or die $!;
+open (my $PAINTED, "$gfffile.sorted.painted") or die $!;
 while (<$PAINTED>) {
   chomp;
   my @F = split (/\s+/, $_);
