@@ -196,21 +196,23 @@ print $OUT2 join ("\t",
 foreach my $chrom (nsort keys %gff_hash) {
   my @blocks1 = @{$gff_hash{$chrom}}; ## array of blocks along chrom
 
-  foreach my $focal_block (@blocks1) {
+  BLOCK: foreach my $focal_block (@blocks1) {
     my $description = "NULL";
     my $result = "collinear";
 
     ## get identity of chrom2 (ie, non-focal chrom linked to focal chrom via block)
     ## prob better way to do this but...
     my $i = 0;
-    my @arr = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2
-    $i++ until $arr[$i] eq $chrom; ## get index of focal chrom
-    splice(@arr, $i, 1); ## splice focal chrom from array, leaving chrom shared by block
-    my @blocks2 = @{$gff_hash{$arr[0]}} if (defined($arr[0])); ## get all blocks on chrom2
+    my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
 
-    if ($chrom eq $arr[0]) {
-      print STDERR "[INFO] $chrom and $arr[0] are the same chrom!\n";
+    $i++ until $all_chroms_per_block[$i] eq $chrom; ## get index of focal chrom
+    splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
+    if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
+      print STDERR "[INFO] Chromosomes shared by block $focal_block are the same! @all_chroms_per_block\n";
+      next BLOCK;
     }
+    
+    my @blocks2 = @{$gff_hash{$all_chroms_per_block[0]}} if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on same chrom
     my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom
 
