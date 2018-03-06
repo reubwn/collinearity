@@ -202,6 +202,7 @@ foreach my $chrom (nsort keys %gff_hash) {
 
     my $i = 0;
     my @arr = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block
+    print STDERR "$chrom\n";
     print STDERR "@arr\n";
     $i++ until $arr[$i] eq $chrom;
     print STDERR "$i\n";
