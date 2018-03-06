@@ -63,7 +63,7 @@ RULES
   (2) collinearity cannot be broken when focal and subject blocks are BOTH terminal on their respective scaffolds
 \n";
 
-my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$verbose);
+my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$morehelp,$verbose);
 my $ks = 0.5;
 
 GetOptions (
@@ -73,7 +73,8 @@ GetOptions (
   'b|blocks'         => \$blockspergenefile,
   'k|ks:f'           => \$ks,
   'v|verbose'        => \$verbose,
-  'h|help'           => \$help
+  'h|help'           => \$help,
+  'm|morehelp'       => \$morehelp
 );
 
 die $usage if $help;
