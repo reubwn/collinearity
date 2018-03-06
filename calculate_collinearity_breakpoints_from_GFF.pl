@@ -78,7 +78,7 @@ GetOptions (
 );
 
 die $usage if $help;
-die "$usage.$definitions" if $morehelp;
+die $usage.$definitions if $morehelp;
 die $usage unless ($collinearityfile && $gfffile && $scorefile);
 
 print STDERR "[INFO] Collinearity file: $collinearityfile\n";
