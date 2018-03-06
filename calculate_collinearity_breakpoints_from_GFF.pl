@@ -16,21 +16,21 @@ SYNOPSIS
 
   Uses GNU 'sort' to presort GFF file.
 
-  OPTIONS
-    -i|--in     [FILE]  : collinearity file (use .reformatted!)
-    -g|--gff    [FILE]  : GFF file
-    -s|--score  [FILE]  : score file with average Ks per block
-    -k|--ks     [FLOAT] : Ks threshold to define homologous block (default <= 0.5)
-    -o|--out            : outfile (default=INFILE.breaks)
-    -b|--blocks         : also print blocks_per_gene file (default=no)
-    -h|--help           : print help
-    -m|--morehelp       : print more help
+OPTIONS
+  -i|--in     [FILE]  : collinearity file (use .reformatted!)
+  -g|--gff    [FILE]  : GFF file
+  -s|--score  [FILE]  : score file with average Ks per block
+  -k|--ks     [FLOAT] : Ks threshold to define homologous block (default <= 0.5)
+  -o|--out            : outfile (default=INFILE.breaks)
+  -b|--blocks         : also print blocks_per_gene file (default=no)
+  -h|--help           : print help
+  -m|--morehelp       : print more help
 
-  USAGE
-    calculate_collinearity_breakpoints.pl -i Xy.collinearity.kaks.reformatted -g Xy.gff -s Xy.collinearity.kaks.score
+USAGE
+  calculate_collinearity_breakpoints.pl -i Xy.collinearity.kaks.reformatted -g Xy.gff -s Xy.collinearity.kaks.score
 \n";
 
-my $definitions = "
+my $definitions = "~~~
 BREAKPOINT DEFINITION
   A collinearity break is introduced if there is a mistmatch in the identity of the upstream
   or downstream homologous blocks from one collinear region to another. Thus, if a[i] is the identity of the focal block on chrom a,
