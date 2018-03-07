@@ -194,10 +194,10 @@ print $OUT2 join ("\t",
                 );
 
 ## main code for detecting breakpoints:
-foreach my $focal_chrom (nsort keys %gff_hash) {
+CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
   my @blocks1 = @{$gff_hash{$focal_chrom}}; ## array of blocks along chrom
 
-  foreach my $focal_block (@blocks1) {
+  BLOCK: foreach my $focal_block (@blocks1) {
     my $description = "NULL";
     my $result = "collinear";
 
@@ -211,13 +211,23 @@ foreach my $focal_chrom (nsort keys %gff_hash) {
     # if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
     #   print STDERR "$focal_block: @all_chroms_per_block\n";
     # }
-    my %chroms = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
+    my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
+    foreach (keys %chroms_linked_to_block) {
+      print STDERR "$_: $all_chroms_per_block{$_}\n\n";
+    }
+    if (scalar(keys(%chroms_linked_to_block))==1) {
+      my ($k,$v) = each (%chroms_linked_to_block);
+      if ($v == 2) {
+        print STDERR "[WARN] Block $focal_block is linked to same chrom ($k)\n";
+        next BLOCK;
+      }
+    }
+    my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
     print STDERR "Focal chrom: $focal_chrom\n";
-    print STDERR join ("\t", $focal_block.":", (keys %chroms), "\n");
-    my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms;
-    print STDERR "Homol chrom: $homol_chrom\n";
+    print STDERR join ("\t", $focal_block.":", (keys %chroms_linked_to_block), "\n");
+    print STDERR "Homol chrom: $homol_chrom\n\n";
 
-    my @blocks2 = @{$gff_hash{$all_chroms_per_block[0]}} if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
+    my @blocks2 = @{$gff_hash{$homol_chrom}};# if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on focal chrom
     my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom2
 
