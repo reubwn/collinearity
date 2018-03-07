@@ -98,7 +98,7 @@ unless ($collinearityfile =~ m/refomatted$/) {
 
 ## things we'll need:
 my (%collinearity_hash, %homologous_blocks_hash, %score_hash, %score_file_hash, %gff_hash, %blocks_hash, %seen);
-my (%total_blocks, %collinear_blocks, %noncollinear_blocks, %noncollinear_blocks_linked_to_same_scaffold);
+my (%total_blocks, %collinear_blocks, %noncollinear_blocks, %noncollinear_blocks_linked_to_same_scaffold, %blocks_linked_to_multiple_homol_regions);
 
 ## sort GFF file:
 if (system("sort -k1,1 -k3,3 -V $gfffile > $gfffile.sorted") != 0) {
@@ -106,18 +106,6 @@ if (system("sort -k1,1 -k3,3 -V $gfffile > $gfffile.sorted") != 0) {
 } else {
   print STDERR "[INFO] Sorted GFF file: $gfffile.sorted\n";
 }
-
-## get blockwise average Ks and scores:
-open (my $SCORE, $scorefile) or die $!;
-while (<$SCORE>) {
-  chomp;
-  my @F = split (/\s+/, $_);
-  $score_hash{$F[0]}{SCORE} = $F[9];
-  $score_hash{$F[0]}{Ka} = $F[10];
-  $score_hash{$F[0]}{Ks} = $F[11];
-  $score_file_hash{$F[0]} = $_; ##file hash
-}
-close $SCORE;
 
 ## get genewise block participation:
 open (my $COLL, $collinearityfile) or die $!;
@@ -134,7 +122,19 @@ while (<$COLL>) {
 }
 close $COLL;
 print STDERR "[INFO] Parsed ".commify(scalar(keys %collinearity_hash))." genes from $collinearityfile\n";
-print STDERR "[INFO] Ks threshold: $ks\n";
+
+## get blockwise average Ks and scores:
+open (my $SCORE, $scorefile) or die $!;
+while (<$SCORE>) {
+  chomp;
+  my @F = split (/\s+/, $_);
+  $score_hash{$F[0]}{SCORE} = $F[9]; ## per block score
+  $score_hash{$F[0]}{Ka} = $F[10]; ## per block Ka
+  $score_hash{$F[0]}{Ks} = $F[11]; ## per block Ks
+}
+close $SCORE;
+print STDERR "[INFO] Parsed ".commify(scalar(keys %score_hash))." blocks from $scorefile\n";
+print STDERR "[INFO] Ks threshold set to: $ks\n";
 
 my $GENES;
 if ($blockspergenefile){
@@ -148,6 +148,7 @@ foreach my $gene (nsort keys %collinearity_hash) {
   }
 }
 close $GENES if ($blockspergenefile);
+print STDERR "[INFO] Number of blocks with Ks <= $ks: ".commify(scalar(keys %homologous_blocks_hash))."\n";
 
 ## add block participation to sorted GFF:
 open (my $OUT1, ">$gfffile.sorted.painted") or die $!;
@@ -157,12 +158,7 @@ while (<$GFF>) {
   my @F = split (/\s+/, $_);
   if (exists($homologous_blocks_hash{$F[1]})) {
     my @blocks = @{$homologous_blocks_hash{$F[1]}}; ## all homologous blocks for that gene; should be 1 but sometimes more
-    # if (scalar(@blocks)>1) {
-    #   print STDERR "[WARN] Gene $F[1] has >1 homologous block: @blocks\n" if $verbose;
-    # } else {
-      print $OUT1 join ("\t", @F, @blocks, "\n");
-      # $seen{$blocks[0]}++;
-    # }
+    print $OUT1 join ("\t", @F, join("|",@blocks), "\n");
   } else {
     print $OUT1 join ("\t", @F, "-", "\n");
   }
@@ -175,16 +171,19 @@ open (my $PAINTED, "$gfffile.sorted.painted") or die $!;
 while (<$PAINTED>) {
   chomp;
   my @F = split (/\s+/, $_);
-  if ($F[4] =~ /\-/) {
+  if ($F[4] =~ m/\-/) { ## block does not pass Ks threshold
     next;
-  } else {
-    $blocks_hash{$F[4]}{$F[0]}++;
-    #push ( @{ $blocks_hash{$F[4]} }, $F[0]) unless $seen{$F[0]}{$F[4]}; ##key= block, val= @[chroms involved in block]
+  } elsif ($F[4] =~ m/\|/) { ## gene is involved in >1 block
+    my @blocks = split (m/\|/, $F[4]);
+    @blocks_linked_to_multiple_homol_regions{@blocks} = (); ## these are bad blocks!
+  } else { ## only analyse those blocks that link exactly two homol regions
+    $blocks_hash{$F[4]}{$F[0]}++; ## key= block ID; val= chrom name
     push ( @{ $gff_hash{$F[0]} }, $F[4] ) unless $seen{$F[0]}{$F[4]}; ##key= chrom, val= @[order of blocks along chrom]
     $seen{$F[0]}{$F[4]}++;
   }
 }
 close $PAINTED;
+print STDERR "[INFO] Number of blocks with >1 associated homologous region: ".commify(scalar(keys %blocks_linked_to_multiple_homol_regions))."\n";
 
 open (my $OUT2, ">$gfffile.sorted.painted.breaks") or die $!;
 print $OUT2 join ("\t",
@@ -303,7 +302,8 @@ $n  = scalar(keys %noncollinear_blocks) if (%noncollinear_blocks);
 $nl = scalar(keys %noncollinear_blocks_linked_to_same_scaffold) if (%noncollinear_blocks_linked_to_same_scaffold);
 $T  = scalar(keys %total_blocks) if (%total_blocks);
 
-print STDERR "[INFO] Total blocks: ".commify($T)."\n";
+print STDERR "[INFO] ~~~\n";
+print STDERR "[INFO] Number of blocks analysed: ".commify($T)."\n";
 print STDERR "[INFO] Number of collinear blocks: ".commify($c)." (".percentage($c,$T).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify($n)." (".percentage($n,$T).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (linked on same scaffold): ".commify($nl)." (".percentage($nl,$T).")\n";
