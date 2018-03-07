@@ -294,10 +294,17 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
 }
 close $OUT2;
 
-print STDERR "[INFO] Number of collinear blocks: ".commify(scalar(keys %collinear_blocks))." (".percentage(scalar(keys %collinear_blocks),scalar(keys %total_blocks)).")\n";
-print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify(scalar(keys %noncollinear_blocks))." (".percentage(scalar(keys %noncollinear_blocks),scalar(%total_blocks)).")\n";
-print STDERR "[INFO] Number of noncollinear blocks (same scaffold): ".commify(scalar(%noncollinear_blocks_linked_to_same_scaffold))." (".percentage(scalar(%noncollinear_blocks_linked_to_same_scaffold),scalar(%total_blocks)).")\n";
-print STDERR "[INFO] Total number of collinearity breaks: ".commify((scalar(keys %noncollinear_blocks)/2) + scalar(keys %noncollinear_blocks_linked_to_same_scaffold))." (".percentage(((scalar(keys %noncollinear_blocks)/2) + scalar(keys %noncollinear_blocks_linked_to_same_scaffold)),scalar(%total_blocks)).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
+## get some numbers
+my ($c,$n,$nl,$T) = (0,0,0,0);
+$c  = scalar(keys %collinear_blocks) if (%collinear_blocks);
+$n  = scalar(keys %noncollinear_blocks) if (%noncollinear_blocks);
+$nl = scalar(keys %noncollinear_blocks_linked_to_same_scaffold) if (%noncollinear_blocks_linked_to_same_scaffold);
+$T  = scalar(keys %total_blocks) if (%total_blocks);
+
+print STDERR "[INFO] Number of collinear blocks: ".commify($c)." (".percentage($c,$T).")\n";
+print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify($n)." (".percentage($n,$T).")\n";
+print STDERR "[INFO] Number of noncollinear blocks (linked on same scaffold): ".commify($nl)." (".percentage($nl,$T).")\n";
+print STDERR "[INFO] Total number of collinearity breaks: ".commify(($n + $nl)." (".percentage(($n + $nl),$T).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
 print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
