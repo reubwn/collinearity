@@ -33,11 +33,10 @@ Also calculates average Ka and Ks per block, if run on annotated MCScanX file.
 
 ### Options
 ```
-OPTIONS
-  -i|--collinearity [FILE] : collinearity file from MCScanX
-  -g|--gff          [FILE] : modified gff file from MCScanX
-  -k|--kaks                : parse collinearity file to get average ka & ks per block
-  -h|--help                : print this message
+  -i|--in   [FILE] : collinearity file from MCScanX
+  -g|--gff  [FILE] : modified gff file from MCScanX
+  -k|--kaks        : parse collinearity file to get average ka & ks per block
+  -h|--help        : print this message
 ```
 
 ### Outputs
@@ -51,7 +50,6 @@ Type `calculate_collinarity_breakpoints.pl -m` to see full help and definitions.
 
 ### Options
 ```
-OPTIONS
   -i|--in     [FILE]  : collinearity file (use .reformatted!)
   -g|--gff    [FILE]  : GFF file
   -s|--score  [FILE]  : score file with average Ks per block
@@ -63,7 +61,7 @@ OPTIONS
 ```
 
 ### Definition of a breakpoint
-A collinearity break is introduced if there is a mistmatch in the identity of the upstream or downstream homologous blocks from one collinear region to another. Thus, if a[i] is the identity of the focal block on chrom a, homologous with block b[j] on chrom b, collinearity is broken if a[i+/-1] != b[j+/-1]. A caveat is when the focal block is located at the terminus of a scaffold - here, collinearity is not broken if the homologous scaffold can be orientated 'away' from the focal scaffold.
+A collinearity break is introduced if there is a mistmatch in the identity of the upstream or downstream homologous blocks from one collinear region to another. Thus, if `a[i]` is the identity of the focal block on chrom `a`, homologous with block `b[j]` on chrom `b`, collinearity is broken if `a[i+/-1] != b[j+/-1]`. A caveat is when the focal block is located at the terminus of a scaffold; here, collinearity is not broken if the homologous scaffold can be orientated 'away' from the focal scaffold.
 
 1. Collinearity cannot be broken by scaffolds containing only 1 collinear block.
 2. Collinearity cannot be broken when focal and subject blocks are BOTH terminal on their respective scaffolds.
@@ -104,6 +102,9 @@ Decomposes any such cases into tandem arrays or palindromes.
 ```
 
 ### Output
-1. arrays file       : all results
-2. arrays.tandem     : tandem arrays
-3. arrays.palindrome : palindromic arrays
+1. arrays file: all results
+2. arrays.tandem: tandem arrays
+3. arrays.palindrome: palindromic arrays
+
+## Other Scripts
+There are a bunch of other helper scripts for Circos plotting... type `-h` for options.
