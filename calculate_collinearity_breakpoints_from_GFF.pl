@@ -194,8 +194,8 @@ print $OUT2 join ("\t",
                 );
 
 ## main code for detecting breakpoints:
-foreach my $chrom (nsort keys %gff_hash) {
-  my @blocks1 = @{$gff_hash{$chrom}}; ## array of blocks along chrom
+foreach my $focal_chrom (nsort keys %gff_hash) {
+  my @blocks1 = @{$gff_hash{$focal_chrom}}; ## array of blocks along chrom
 
   foreach my $focal_block (@blocks1) {
     my $description = "NULL";
@@ -205,14 +205,17 @@ foreach my $chrom (nsort keys %gff_hash) {
     ## prob better way to do this but...
     my $i = 0;
     my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
-    $i++ until $all_chroms_per_block[$i] eq $chrom; ## get index of focal chrom
+    $i++ until $all_chroms_per_block[$i] eq $focal_chrom; ## get index of focal chrom
     splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
     #
     # if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
     #   print STDERR "$focal_block: @all_chroms_per_block\n";
     # }
     my %chroms = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
+    print STDERR "Focal chrom: $focal_chrom\n";
     print STDERR join ("\t", $focal_block.":", (keys %chroms), "\n");
+    my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms;
+    print STDERR "Homol chrom: $homol_chrom\n";
 
     my @blocks2 = @{$gff_hash{$all_chroms_per_block[0]}} if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on focal chrom
@@ -275,7 +278,7 @@ foreach my $chrom (nsort keys %gff_hash) {
           }
     }
 
-    print $OUT2 "$chrom\t";
+    print $OUT2 "$focal_chrom\t";
     print $OUT2 join ("|", @blocks1);
     print $OUT2 "\t$focal_block\t";
     print $OUT2 join ("|", @{$blocks_hash{$focal_block}});
