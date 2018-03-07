@@ -286,7 +286,7 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     print $OUT2 "$focal_chrom\t";
     print $OUT2 join ("|", @blocks1);
     print $OUT2 "\t$focal_block\t";
-    print $OUT2 join ("|", @{$blocks_hash{$focal_block}});
+    print $OUT2 join ("|", keys %{ $blocks_hash{$focal_block} });
     print $OUT2 "\t$homol_chrom\t";
     print $OUT2 join ("|", @blocks2);
     print $OUT2 "\t$description\t$result\n";
