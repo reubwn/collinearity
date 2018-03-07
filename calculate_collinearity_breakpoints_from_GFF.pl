@@ -212,15 +212,9 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     #   print STDERR "$focal_block: @all_chroms_per_block\n";
     # }
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
-    foreach (keys %chroms_linked_to_block) {
-      print STDERR "$_: $chroms_linked_to_block{$_}\n\n";
-    }
     if (scalar(keys(%chroms_linked_to_block))==1) {
-      my ($k,$v) = each (%chroms_linked_to_block);
-      if ($v == 2) {
-        print STDERR "[WARN] Block $focal_block is linked to same chrom ($k)\n";
-        next BLOCK;
-      }
+      print STDERR "[WARN] Block $focal_block is linked to same chrom ($k)\n";
+      next BLOCK;
     }
     my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
     print STDERR "Focal chrom: $focal_chrom\n";
