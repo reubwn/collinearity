@@ -89,7 +89,6 @@ die $usage unless ($collinearityfile && $gfffile && $scorefile);
 print STDERR "[INFO] Collinearity file: $collinearityfile\n";
 print STDERR "[INFO] GFF file: $gfffile\n";
 print STDERR "[INFO] Score file: $scorefile\n";
-print STDERR "[INFO] Ks threshold: $ks\n";
 
 ## die unless refomatted collinearity file:
 unless ($collinearityfile =~ m/refomatted$/) {
@@ -134,6 +133,7 @@ while (<$COLL>) {
 }
 close $COLL;
 print STDERR "[INFO] Parsed ".commify(scalar(keys %collinearity_hash))." genes from $collinearityfile\n";
+print STDERR "[INFO] Ks threshold: $ks\n";
 
 my $GENES;
 if ($blockspergenefile){
@@ -210,7 +210,8 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     ## get identity of $homol_chrom (ie, non-focal chrom linked to focal chrom via block $focal_block)
     my %chroms_linked_to_block = %{ $blocks_hash{$focal_block} }; ## get all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) { ## indication that focal and homol chrom are the same!
-      print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join (" ", keys %chroms_linked_to_block)).")\n";
+      # print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join (" ", keys %chroms_linked_to_block)).")\n";
+      print $OUT2 join ("\t", $focal_chrom, (join("|",@blocks1)), $focal_block, "NA", "NA", "NA", "Block links two regions on same scaffold", "break", "\n");
       $noncollinear_blocks_linked_to_same_scaffold{$focal_block}++;
       next BLOCK; ## go straight to next block without evaluating code below
     } elsif (scalar(keys(%chroms_linked_to_block))>2) { ## indication that block may link to more than 2 chroms, eg could be caused by recent duplications leading to >2 homologous regions
