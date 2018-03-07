@@ -211,6 +211,7 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## get all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) { ## indication that focal and homol chrom are the same!
       print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join (" ", keys %chroms_linked_to_block)).")!\n";
+      $noncollinear_blocks_linked_to_same_scaffold++;
       next BLOCK; ## go straight to next block without evaluating code below
     } elsif (scalar(keys(%chroms_linked_to_block))>2) { ## indication that block may link to more than 2 chroms, eg could be caused by recent duplications leading to >2 homologous regions
       print STDERR "[INFO]+ Block $focal_block is linked to multiple scaffolds (".(join (" ", keys %chroms_linked_to_block)).")!\n";
@@ -294,8 +295,9 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
 close $OUT2;
 
 print STDERR "[INFO] Number of collinear blocks: ".commify($collinear_blocks)." (".percentage($collinear_blocks,$total_blocks).")\n";
-print STDERR "[INFO] Number of noncollinear blocks: ".commify($noncollinear_blocks)." (".percentage($noncollinear_blocks,$total_blocks).")\n";
-print STDERR "[INFO] Number of collinearity breaks: ".($noncollinear_blocks/2)."\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
+print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify($noncollinear_blocks)." (".percentage($noncollinear_blocks,$total_blocks).")\n";
+print STDERR "[INFO] Number of noncollinear blocks (same scaffold): ".commify($noncollinear_blocks_linked_to_same_scaffold)." (".percentage($noncollinear_blocks_linked_to_same_scaffold,$total_blocks).")\n";
+print STDERR "[INFO] Total number of collinearity breaks: ".($noncollinear_blocks+$noncollinear_blocks_linked_to_same_scaffold)."(".percentage(($noncollinear_blocks+$noncollinear_blocks_linked_to_same_scaffold),$total_blocks).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
 print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
