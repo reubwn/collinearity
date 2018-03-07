@@ -304,7 +304,7 @@ $T  = scalar(keys %total_blocks) if (%total_blocks);
 print STDERR "[INFO] Number of collinear blocks: ".commify($c)." (".percentage($c,$T).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify($n)." (".percentage($n,$T).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (linked on same scaffold): ".commify($nl)." (".percentage($nl,$T).")\n";
-print STDERR "[INFO] Total number of collinearity breaks: ".commify(($n + $nl)." (".percentage(($n + $nl),$T).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
+print STDERR "[INFO] Total number of collinearity breaks: ".commify(($n+$nl))." (".percentage(($n+$nl),$T).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
 print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
