@@ -187,6 +187,10 @@ while (<$PAINTED>) {
 close $PAINTED;
 print STDERR "[INFO] Number of blocks with >1 associated homologous region: ".commify(scalar(keys %blocks_linked_to_multiple_homol_regions))."\n";
 
+foreach (keys %blocks_linked_to_multiple_homol_regions) {
+  print STDERR "$_\n";
+}
+
 open (my $OUT2, ">$gfffile.sorted.painted.breaks") or die $!;
 print $OUT2 join ("\t",
                  "A.CHROM",
