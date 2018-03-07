@@ -215,9 +215,9 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
       next BLOCK;
     }
     my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
-    print STDERR "Focal chrom: $focal_chrom\n";
-    print STDERR join ("\t", $focal_block.":", (keys %chroms_linked_to_block), "\n");
-    print STDERR "Homol chrom: $homol_chrom\n\n";
+    # print STDERR "Focal chrom: $focal_chrom\n";
+    # print STDERR join ("\t", $focal_block.":", (keys %chroms_linked_to_block), "\n");
+    # print STDERR "Homol chrom: $homol_chrom\n\n";
 
     my @blocks2 = @{$gff_hash{$homol_chrom}};# if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on focal chrom
