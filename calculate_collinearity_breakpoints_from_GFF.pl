@@ -210,10 +210,10 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     ## get identity of $homol_chrom (ie, non-focal chrom linked to focal chrom via block $focal_block)
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## get all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) { ## indication that focal and homol chrom are the same!
-      print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join ("\s", keys %chroms_linked_to_block)).")!\n";
+      print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join (" ", keys %chroms_linked_to_block)).")!\n";
       next BLOCK; ## go straight to next block without evaluating code below
     } elsif (scalar(keys(%chroms_linked_to_block))>2) { ## indication that block may link to more than 2 chroms, eg could be caused by recent duplications leading to >2 homologous regions
-      print STDERR "[INFO]+ Block $focal_block is linked to multiple scaffolds (".(join ("\s", keys %chroms_linked_to_block)).")!\n";
+      print STDERR "[INFO]+ Block $focal_block is linked to multiple scaffolds (".(join (" ", keys %chroms_linked_to_block)).")!\n";
       next BLOCK; ## also skip these cases
     }
     my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
