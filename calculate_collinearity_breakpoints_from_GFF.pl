@@ -213,7 +213,7 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     # }
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
     foreach (keys %chroms_linked_to_block) {
-      print STDERR "$_: $all_chroms_per_block{$_}\n\n";
+      print STDERR "$_: $chroms_linked_to_block{$_}\n\n";
     }
     if (scalar(keys(%chroms_linked_to_block))==1) {
       my ($k,$v) = each (%chroms_linked_to_block);
