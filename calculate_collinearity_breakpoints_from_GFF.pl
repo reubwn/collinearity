@@ -93,7 +93,7 @@ unless ($collinearityfile =~ m/refomatted$/) {
 
 ## things we'll need:
 my (%collinearity_hash, %homologous_blocks_hash, %score_hash, %score_file_hash, %gff_hash, %blocks_hash, %blocks_hash_test, %seen);
-my ($collinear_blocks, $noncollinear_blocks, $total_blocks) = (0,0,0);
+my ($collinear_blocks, $noncollinear_blocks, $noncollinear_blocks_linked_to_same_scaffold, $total_blocks) = (0,0,0,0);
 
 ## sort GFF file:
 if (system("sort -k1,1 -k3,3 -V $gfffile > $gfffile.sorted") != 0) {
@@ -200,6 +200,7 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
   BLOCK: foreach my $focal_block (@blocks1) {
     my $description = "NULL";
     my $result = "collinear";
+    $total_blocks++;
 
     ## get identity of chrom2 (ie, non-focal chrom linked to focal chrom via block)
     ## prob better way to do this but...
@@ -208,13 +209,15 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     # $i++ until $all_chroms_per_block[$i] eq $focal_chrom; ## get index of focal chrom
     # splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
 
-    my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
-    if (scalar(keys(%chroms_linked_to_block))==1) {
-      print STDERR "[INFO] Block $focal_block is linked to same chrom (".(join ("\s", keys %chroms_linked_to_block)).")\n";
+    my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## get all chroms linked by $focal_block
+    if (scalar(keys(%chroms_linked_to_block))==1) { ## indication that focal and homol chrom are the same!
+      print STDERR "[INFO] Block $focal_block is linked to same scaffold (".(join ("\s", keys %chroms_linked_to_block)).")\n";
       $description = "A and B on the same scaffold";
-      $result = "break";
-      $noncollinear_blocks++;
-      next BLOCK;
+      $result = "break"; ## this is a break
+      $noncollinear_blocks_linked_to_same_scaffold++;
+      next BLOCK; ## go straight to next block without evaluating code below
+    } elsif (scalar(keys(%chroms_linked_to_block))>2) { ## indication that block may link to more than 2 chroms, eg could be caused by recent duplications leading to >2 homologous regions
+      print STDERR "[INFO] Block $focal_block is linked to multiple scaffolds (".(join ("\s", keys %chroms_linked_to_block)).")\n";
     }
     my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
     # print STDERR "Focal chrom: $focal_chrom\n";
@@ -289,14 +292,13 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     print $OUT2 "\t$homol_chrom\t";
     print $OUT2 join ("|", @blocks2);
     print $OUT2 "\t$description\t$result\n";
-    $total_blocks++;
   }
 }
 close $OUT2;
 
 print STDERR "[INFO] Number of collinear blocks: ".commify($collinear_blocks)." (".percentage($collinear_blocks,$total_blocks).")\n";
 print STDERR "[INFO] Number of noncollinear blocks: ".commify($noncollinear_blocks)." (".percentage($noncollinear_blocks,$total_blocks).")\n";
-print STDERR "[INFO] Number of collinearity breaks: ".($noncollinear_blocks/2)."\n";
+print STDERR "[INFO] Number of collinearity breaks: ".(($noncollinear_blocks/2)+$noncollinear_blocks_linked_to_same_scaffold)."\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
 print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
