@@ -178,6 +178,7 @@ while (<$PAINTED>) {
   } elsif ($F[4] =~ m/\|/) { ## gene is involved in >1 block
     my @blocks = split (m/\|/, $F[4]);
     @blocks_linked_to_multiple_homol_regions{@blocks} = (); ## these are bad blocks!
+    next;
   } else { ## only analyse those blocks that link exactly two homol regions
     $blocks_hash{$F[4]}{$F[0]}++; ## key= block ID; val= chrom name
     push ( @{ $gff_hash{$F[0]} }, $F[4] ) unless $seen{$F[0]}{$F[4]}; ##key= chrom, val= @[order of blocks along chrom]
