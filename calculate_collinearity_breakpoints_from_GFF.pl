@@ -203,17 +203,15 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
 
     ## get identity of chrom2 (ie, non-focal chrom linked to focal chrom via block)
     ## prob better way to do this but...
-    my $i = 0;
-    my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
-    $i++ until $all_chroms_per_block[$i] eq $focal_chrom; ## get index of focal chrom
-    splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
-    #
-    # if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
-    #   print STDERR "$focal_block: @all_chroms_per_block\n";
-    # }
+    # my $i = 0;
+    # my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
+    # $i++ until $all_chroms_per_block[$i] eq $focal_chrom; ## get index of focal chrom
+    # splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
+
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) {
-      print STDERR "[WARN] Block $focal_block is linked to same chrom (".(keys %chroms_linked_to_block).")\n";
+      print STDERR "[INFO] Block $focal_block is linked to same chrom (@{keys %chroms_linked_to_block})\n";
+      $noncollinear_blocks++;
       next BLOCK;
     }
     my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
@@ -286,8 +284,8 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     print $OUT2 join ("|", @blocks1);
     print $OUT2 "\t$focal_block\t";
     print $OUT2 join ("|", @{$blocks_hash{$focal_block}});
-    print $OUT2 "\t@all_chroms_per_block\t";
-    print $OUT2 join ("|", @blocks2) if (defined($all_chroms_per_block[0]));
+    print $OUT2 "\t@{keys %chroms_linked_to_block}\t";
+    print $OUT2 join ("|", @blocks2);
     print $OUT2 "\t$description\t$result\n";
     $total_blocks++;
   }
