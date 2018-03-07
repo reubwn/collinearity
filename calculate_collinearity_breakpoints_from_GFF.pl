@@ -302,6 +302,7 @@ $n  = scalar(keys %noncollinear_blocks) if (%noncollinear_blocks);
 $nl = scalar(keys %noncollinear_blocks_linked_to_same_scaffold) if (%noncollinear_blocks_linked_to_same_scaffold);
 $T  = scalar(keys %total_blocks) if (%total_blocks);
 
+print STDERR "[INFO] Total blocks: ".commify($T)."\n";
 print STDERR "[INFO] Number of collinear blocks: ".commify($c)." (".percentage($c,$T).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify($n)." (".percentage($n,$T).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (linked on same scaffold): ".commify($nl)." (".percentage($nl,$T).")\n";
