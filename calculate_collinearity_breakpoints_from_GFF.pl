@@ -170,27 +170,27 @@ close $OUT1;
 
 ## reopen PAINTED GFF file:
 open (my $PAINTED, "$gfffile.sorted.painted") or die $!;
-while (<$PAINTED>) {
+GENE: while (<$PAINTED>) {
   chomp;
   my @F = split (/\s+/, $_);
   if ($F[4] =~ m/\-/) { ## block does not pass Ks threshold
-    next;
+    next GENE;
   } elsif ($F[4] =~ m/\|/) { ## gene is involved in >1 block
     my @blocks = split (m/\|/, $F[4]);
     @blocks_linked_to_multiple_homol_regions{@blocks} = (); ## these are bad blocks!
-    next;
+    next GENE;
   } else { ## only analyse those blocks that link exactly two homol regions
-    $blocks_hash{$F[4]}{$F[0]}++; ## key= block ID; val= chrom name
+    $blocks_hash{$F[4]}{$F[0]}++; ## key= block ID; val= %{chrom names associated with that block}
     push ( @{ $gff_hash{$F[0]} }, $F[4] ) unless $seen{$F[0]}{$F[4]}; ##key= chrom, val= @[order of blocks along chrom]
     $seen{$F[0]}{$F[4]}++;
   }
 }
 close $PAINTED;
-print STDERR "[INFO] Number of blocks with >1 associated homologous region: ".commify(scalar(keys %blocks_linked_to_multiple_homol_regions))."\n";
+print STDERR "[INFO] Number of blocks linking exactly 2 homologous regions: ".commify(scalar(keys %blocks_hash))."\n";
 
-foreach (keys %blocks_linked_to_multiple_homol_regions) {
-  print STDERR "$_\n";
-}
+# foreach (keys %blocks_linked_to_multiple_homol_regions) {
+#   print STDERR "$_\n";
+# }
 
 open (my $OUT2, ">$gfffile.sorted.painted.breaks") or die $!;
 print $OUT2 join ("\t",
