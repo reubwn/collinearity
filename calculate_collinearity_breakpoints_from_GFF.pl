@@ -63,9 +63,10 @@ RULES
   (2) collinearity cannot be broken when focal and subject blocks are BOTH terminal on their respective scaffolds
 
 NOTES
-  Cases where homologous blocks are found on the same scaffold are also accounted for in the script.
-  Use the script 'calculate_collinearity_palindromes.pl' to search in more detail for these 'linked' cases.
-  Cases where a focal region shows >1 homologous region (e.g., recent duplications of A, B and B') are discounted (skipped).
+  (1) Cases where homologous blocks are found on the same scaffold are also accounted for in the script.
+  (2) Use the script 'calculate_collinearity_palindromes.pl' to search in more detail for these 'linked' cases.
+  (3) Cases where a focal region shows >1 homologous region (e.g., recent duplications of A, B and B') are discounted
+      as determining orthology from paralogy is not possible with these data (these sites are simply skipped).
 \n";
 
 my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$morehelp,$verbose);
@@ -156,12 +157,12 @@ while (<$GFF>) {
   my @F = split (/\s+/, $_);
   if (exists($homologous_blocks_hash{$F[1]})) {
     my @blocks = @{$homologous_blocks_hash{$F[1]}}; ## all homologous blocks for that gene; should be 1 but sometimes more
-    if (scalar(@blocks)>1) {
-      print STDERR "[WARN] Gene $F[1] has >1 homologous block: @blocks\n" if $verbose;
-    } else {
+    # if (scalar(@blocks)>1) {
+    #   print STDERR "[WARN] Gene $F[1] has >1 homologous block: @blocks\n" if $verbose;
+    # } else {
       print $OUT1 join ("\t", @F, @blocks, "\n");
-      $seen{$blocks[0]}++;
-    }
+      # $seen{$blocks[0]}++;
+    # }
   } else {
     print $OUT1 join ("\t", @F, "-", "\n");
   }
