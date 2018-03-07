@@ -141,14 +141,16 @@ if ($blockspergenefile){
   open ($GENES, ">$gfffile.blocks_per_gene") or die $!;
 }
 
+my $pass = 0;
 foreach my $gene (nsort keys %collinearity_hash) {
   print $GENES "$gene\t@{$collinearity_hash{$gene}}\n" if ($blockspergenefile);
   foreach my $block (@{$collinearity_hash{$gene}}) {
     push ( @{$homologous_blocks_hash{$gene}}, $block ) if $score_hash{$block}{Ks} <= $ks; ## %homologous_blocks_hash contains ONLY homologous blocks with Ks <= threshold
+    $pass++ if $score_hash{$block}{Ks} <= $ks;
   }
 }
 close $GENES if ($blockspergenefile);
-print STDERR "[INFO] Number of blocks with Ks <= $ks: ".commify(scalar(keys %homologous_blocks_hash))."\n";
+print STDERR "[INFO] Number of blocks with Ks <= $ks: $pass\n";
 
 ## add block participation to sorted GFF:
 open (my $OUT1, ">$gfffile.sorted.painted") or die $!;
