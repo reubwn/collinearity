@@ -134,7 +134,7 @@ while (<$SCORE>) {
 }
 close $SCORE;
 print STDERR "[INFO] Parsed ".commify(scalar(keys %score_hash))." blocks from $scorefile\n";
-print STDERR "[INFO] Ks threshold set to: $ks\n";
+# print STDERR "[INFO] Ks threshold set to: $ks\n";
 
 my $GENES;
 if ($blockspergenefile){
@@ -176,8 +176,7 @@ GENE: while (<$PAINTED>) {
   if ($F[4] =~ m/\-/) { ## block does not pass Ks threshold
     next GENE;
   } elsif ($F[4] =~ m/\|/) { ## gene is involved in >1 block
-    my @blocks = split (m/\|/, $F[4]);
-    @blocks_linked_to_multiple_homol_regions{@blocks} = (); ## these are bad blocks!
+    ## if all genes in given block are involved in >1 block, that block will be omitted
     next GENE;
   } else { ## only analyse those blocks that link exactly two homol regions
     $blocks_hash{$F[4]}{$F[0]}++; ## key= block ID; val= %{chrom names associated with that block}
@@ -186,11 +185,7 @@ GENE: while (<$PAINTED>) {
   }
 }
 close $PAINTED;
-print STDERR "[INFO] Number of blocks linking exactly 2 homologous regions: ".commify(scalar(keys %blocks_hash))."\n";
-
-# foreach (keys %blocks_linked_to_multiple_homol_regions) {
-#   print STDERR "$_\n";
-# }
+# print STDERR "[INFO] Number of blocks linking exactly 2 homologous regions: ".commify(scalar(keys %blocks_hash))."\n";
 
 open (my $OUT2, ">$gfffile.sorted.painted.breaks") or die $!;
 print $OUT2 join ("\t",
