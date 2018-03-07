@@ -63,9 +63,9 @@ RULES
   (2) collinearity cannot be broken when focal and subject blocks are BOTH terminal on their respective scaffolds
 
 NOTES
-  Cases where homologous blocks are found on the same scaffold are accounted for in the script, but are not counted as 'breaks' in this context
-  Use the script 'calculate_collinearity_palindromes.pl' to search for these cases.
-  Cases where a focal region shows >1 homologous region (e.g., recent duplications of A, B and B') are also discounted.
+  Cases where homologous blocks are found on the same scaffold are also accounted for in the script.
+  Use the script 'calculate_collinearity_palindromes.pl' to search in more detail for these 'linked' cases.
+  Cases where a focal region shows >1 homologous region (e.g., recent duplications of A, B and B') are discounted (skipped).
 \n";
 
 my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$morehelp,$verbose);
@@ -97,8 +97,8 @@ unless ($collinearityfile =~ m/refomatted$/) {
 }
 
 ## things we'll need:
-my (%collinearity_hash, %homologous_blocks_hash, %score_hash, %score_file_hash, %gff_hash, %blocks_hash, %blocks_hash_test, %seen);
-my ($collinear_blocks, $noncollinear_blocks, $noncollinear_blocks_linked_to_same_scaffold, $total_blocks) = (0,0,0,0);
+my (%collinearity_hash, %homologous_blocks_hash, %score_hash, %score_file_hash, %gff_hash, %blocks_hash, %seen);
+my (%total_blocks, %collinear_blocks, %noncollinear_blocks, %noncollinear_blocks_linked_to_same_scaffold);
 
 ## sort GFF file:
 if (system("sort -k1,1 -k3,3 -V $gfffile > $gfffile.sorted") != 0) {
@@ -205,16 +205,16 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
   BLOCK: foreach my $focal_block (@blocks1) {
     my $description = "NULL";
     my $result = "collinear";
-    $total_blocks++;
+    $total_blocks{$focal_block}++;
 
     ## get identity of $homol_chrom (ie, non-focal chrom linked to focal chrom via block $focal_block)
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## get all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) { ## indication that focal and homol chrom are the same!
-      print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join (" ", keys %chroms_linked_to_block)).")!\n";
-      $noncollinear_blocks_linked_to_same_scaffold++;
+      print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join (" ", keys %chroms_linked_to_block)).")\n";
+      $noncollinear_blocks_linked_to_same_scaffold{$focal_block}++;
       next BLOCK; ## go straight to next block without evaluating code below
     } elsif (scalar(keys(%chroms_linked_to_block))>2) { ## indication that block may link to more than 2 chroms, eg could be caused by recent duplications leading to >2 homologous regions
-      print STDERR "[INFO]+ Block $focal_block is linked to multiple scaffolds (".(join (" ", keys %chroms_linked_to_block)).")!\n";
+      print STDERR "[INFO]+ Block $focal_block is linked to multiple scaffolds (".(join (" ", keys %chroms_linked_to_block)).")\n";
       next BLOCK; ## also skip these cases
     }
     my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
@@ -228,14 +228,14 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
 
     if ( ("@blocks1" =~ "@blocks2") || ("@blocks1" =~ join (" ", reverse(@blocks2))) ) {
       $description = "B subset of A";
-      $collinear_blocks++;
+      $collinear_blocks{$focal_block}++;
     } elsif ( ("@blocks2" =~ "@blocks1") || ("@blocks2" =~ join (" ", reverse(@blocks1))) ) {
       $description = "A subset of B";
-      $collinear_blocks++;
+      $collinear_blocks{$focal_block}++;
     } else {
       if ( ($index1 == 0 || $index1 == $#blocks1) && ($index2 == 0 || $index2 == $#blocks2) ) {
             $description = "both terminal";
-            $collinear_blocks++;
+            $collinear_blocks{$focal_block}++;
           } elsif ( ($index1 != 0 || $index1 != $#blocks1) && ($index2 == 0 || $index2 == $#blocks2) ) {
             $description = "B#$focal_block is terminal";
             my ($i,$j)=($index1,$index2);
@@ -245,15 +245,15 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
               unless ($blocks1[($i+1)] == $blocks2[($j+1)]) {
                 $description .= " (3')";
                 $result = "break";
-                $noncollinear_blocks++;
-              } else {$collinear_blocks++;}
+                $noncollinear_blocks{$focal_block}++;
+              } else {$collinear_blocks{$focal_block}++;}
             ## traverse blocks backwards:
           } elsif ($index2==$#blocks2) { ##subject block is 5' terminal
               unless ($blocks1[($i-1)] == $blocks2[($j-1)]) {
                 $description .= " (5')";
                 $result = "break";
-                $noncollinear_blocks++;
-              } else {$collinear_blocks++;}
+                $noncollinear_blocks{$focal_block}++;
+              } else {$collinear_blocks{$focal_block}++;}
             }
 
           } elsif ( ($index1 == 0 || $index1 == $#blocks1) && ($index2 != 0 || $index2 != $#blocks2) ) {
@@ -265,21 +265,21 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
               unless ($blocks1[($i+1)] == $blocks2[($j+1)]) {
                 $description .= " (3')";
                 $result = "break";
-                $noncollinear_blocks++;
-              } else {$collinear_blocks++;}
+                $noncollinear_blocks{$focal_block}++;
+              } else {$collinear_blocks{$focal_block}++;}
             ## traverse blocks backwards:
           } elsif ($index1==$#blocks1) { ##focal block is 5' terminal
               unless ($blocks1[($i-1)] == $blocks2[($j-1)]) {
                 $description .= " (5')";
                 $result = "break";
-                $noncollinear_blocks++;
-              } else {$collinear_blocks++;}
+                $noncollinear_blocks{$focal_block}++;
+              } else {$collinear_blocks{$focal_block}++;}
             }
 
           } else {
             $description = "neither terminal";
             $result = "break";
-            $noncollinear_blocks++;
+            $noncollinear_blocks{$focal_block}++;
           }
     }
 
@@ -294,10 +294,10 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
 }
 close $OUT2;
 
-print STDERR "[INFO] Number of collinear blocks: ".commify($collinear_blocks)." (".percentage($collinear_blocks,$total_blocks).")\n";
-print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify($noncollinear_blocks)." (".percentage($noncollinear_blocks,$total_blocks).")\n";
-print STDERR "[INFO] Number of noncollinear blocks (same scaffold): ".commify($noncollinear_blocks_linked_to_same_scaffold)." (".percentage($noncollinear_blocks_linked_to_same_scaffold,$total_blocks).")\n";
-print STDERR "[INFO] Total number of collinearity breaks: ".($noncollinear_blocks+$noncollinear_blocks_linked_to_same_scaffold)."(".percentage(($noncollinear_blocks+$noncollinear_blocks_linked_to_same_scaffold),$total_blocks).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
+print STDERR "[INFO] Number of collinear blocks: ".commify(scalar(keys %collinear_blocks))." (".percentage(scalar(keys %collinear_blocks),scalar(keys %total_blocks)).")\n";
+print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify(scalar(keys %noncollinear_blocks))." (".percentage(scalar(keys %noncollinear_blocks),scalar(%total_blocks)).")\n";
+print STDERR "[INFO] Number of noncollinear blocks (same scaffold): ".commify(scalar(%noncollinear_blocks_linked_to_same_scaffold))." (".percentage(scalar(%noncollinear_blocks_linked_to_same_scaffold),scalar(%total_blocks)).")\n";
+print STDERR "[INFO] Total number of collinearity breaks: ".commify((scalar(keys %noncollinear_blocks)/2) + $noncollinear_blocks_linked_to_same_scaffold)." (".percentage(((scalar(keys %noncollinear_blocks)/2) + scalar(keys %noncollinear_blocks_linked_to_same_scaffold)),scalar(%total_blocks)).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
 print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
