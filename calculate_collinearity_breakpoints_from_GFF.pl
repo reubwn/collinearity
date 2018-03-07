@@ -177,8 +177,8 @@ while (<$PAINTED>) {
   if ($F[4] =~ /\-/) {
     next;
   } else {
-    $blocks_hash_test{$F[4]}{$F[0]}++;
-    push ( @{ $blocks_hash{$F[4]} }, $F[0]) unless $seen{$F[0]}{$F[4]}; ##key= block, val= @[chroms involved in block]
+    $blocks_hash{$F[4]}{$F[0]}++;
+    #push ( @{ $blocks_hash{$F[4]} }, $F[0]) unless $seen{$F[0]}{$F[4]}; ##key= block, val= @[chroms involved in block]
     push ( @{ $gff_hash{$F[0]} }, $F[4] ) unless $seen{$F[0]}{$F[4]}; ##key= chrom, val= @[order of blocks along chrom]
     $seen{$F[0]}{$F[4]}++;
   }
@@ -208,7 +208,7 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     $total_blocks{$focal_block}++;
 
     ## get identity of $homol_chrom (ie, non-focal chrom linked to focal chrom via block $focal_block)
-    my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## get all chroms linked by $focal_block
+    my %chroms_linked_to_block = %{ $blocks_hash{$focal_block} }; ## get all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) { ## indication that focal and homol chrom are the same!
       print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join (" ", keys %chroms_linked_to_block)).")\n";
       $noncollinear_blocks_linked_to_same_scaffold{$focal_block}++;
@@ -297,7 +297,7 @@ close $OUT2;
 print STDERR "[INFO] Number of collinear blocks: ".commify(scalar(keys %collinear_blocks))." (".percentage(scalar(keys %collinear_blocks),scalar(keys %total_blocks)).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify(scalar(keys %noncollinear_blocks))." (".percentage(scalar(keys %noncollinear_blocks),scalar(%total_blocks)).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (same scaffold): ".commify(scalar(%noncollinear_blocks_linked_to_same_scaffold))." (".percentage(scalar(%noncollinear_blocks_linked_to_same_scaffold),scalar(%total_blocks)).")\n";
-print STDERR "[INFO] Total number of collinearity breaks: ".commify((scalar(keys %noncollinear_blocks)/2) + $noncollinear_blocks_linked_to_same_scaffold)." (".percentage(((scalar(keys %noncollinear_blocks)/2) + scalar(keys %noncollinear_blocks_linked_to_same_scaffold)),scalar(%total_blocks)).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
+print STDERR "[INFO] Total number of collinearity breaks: ".commify((scalar(keys %noncollinear_blocks)/2) + scalar(keys %noncollinear_blocks_linked_to_same_scaffold))." (".percentage(((scalar(keys %noncollinear_blocks)/2) + scalar(keys %noncollinear_blocks_linked_to_same_scaffold)),scalar(%total_blocks)).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
 print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
