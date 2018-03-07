@@ -210,7 +210,7 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
 
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) {
-      print STDERR "[INFO] Block $focal_block is linked to same chrom (".(join(" ",@{keys %chroms_linked_to_block}).")\n";
+      print STDERR "[INFO] Block $focal_block is linked to same chrom (".(join(" ",@{keys %chroms_linked_to_block})).")\n";
       $description = "A and B on the same scaffold";
       $result = "break";
       $noncollinear_blocks++;
