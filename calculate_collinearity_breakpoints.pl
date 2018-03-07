@@ -73,14 +73,14 @@ my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$morehelp,$ve
 my $ks = 0.5;
 
 GetOptions (
-  'i|collinearity=s' => \$collinearityfile,
-  'g|gff=s'          => \$gfffile,
-  's|score=s'        => \$scorefile,
-  'b|blocks'         => \$blockspergenefile,
-  'k|ks:f'           => \$ks,
-  'v|verbose'        => \$verbose,
-  'h|help'           => \$help,
-  'm|morehelp'       => \$morehelp
+  'i|in=s'     => \$collinearityfile,
+  'g|gff=s'    => \$gfffile,
+  's|score=s'  => \$scorefile,
+  'b|blocks'   => \$blockspergenefile,
+  'k|ks:f'     => \$ks,
+  'v|verbose'  => \$verbose,
+  'h|help'     => \$help,
+  'm|morehelp' => \$morehelp
 );
 
 die $usage if $help;

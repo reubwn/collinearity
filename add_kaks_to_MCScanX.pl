@@ -34,12 +34,11 @@ my ($infile, $proteinfile, $cdsfile, $help);
 my $threads = 1;
 
 GetOptions (
-  'in|i=s'      => \$infile,
-  'prot|p:s'    => \$proteinfile,
-  'cds|c:s'     => \$cdsfile,
-#  'o|out:s'     => \$outfile,
-  'threads|t:i' => \$threads,
-  'help|h'      => \$help
+  'i|in=s'      => \$infile,
+  'p|prot=s'    => \$proteinfile,
+  'c|cds=s'     => \$cdsfile,
+  't|threads:i' => \$threads,
+  'h|help'      => \$help
 );
 
 die $usage if $help;

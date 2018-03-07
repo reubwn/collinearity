@@ -10,29 +10,30 @@ use Sort::Naturally;
 
 my $usage = "
 SYNOPSIS
+  Searched for cases of homologous regions physically linked on the same scaffolds.
+  Decomposes any such cases into tandem arrays or palindromes.
 
 OUTPUT
+  1. arrays file       : all results
+  2. arrays.tandem     : tandem arrays
+  3. arrays.palindrome : palindromic arrays
 
 OPTIONS
-  -i|--collin [FILE] : collinearity file from MCScanX (annotated with Ks)
-  -g|--gff    [FILE] : collinearity GFF
-  -k|--ks            : only examine blocks with Ks <= this threshold
-  -o|--out           : outfile (default=INFILE.breaks)
-  -h|--help          : print this message
-
-USAGE
-
+  -i|--in   [FILE] : collinearity file from MCScanX (annotated with Ks)
+  -g|--gff  [FILE] : GFF file
+  -k|--ks          : only examine blocks with Ks <= this threshold
+  -h|--help        : print this message
 \n";
 
 my ($collinearityfile,$gfffile,$help,$debug);
 my $ks = 0.5;
 
 GetOptions (
-  'i|collinearity=s' => \$collinearityfile,
-  'g|gff=s'          => \$gfffile,
-  'k|ks:f'           => \$ks,
-  'h|help'           => \$help,
-  'd|debug'          => \$debug
+  'i|in=s'  => \$collinearityfile,
+  'g|gff=s' => \$gfffile,
+  'k|ks:f'  => \$ks,
+  'h|help'  => \$help,
+  'd|debug' => \$debug
 );
 
 die $usage if $help;
