@@ -61,6 +61,11 @@ EXAMPLES
 RULES
   (1) collinearity cannot be broken by scaffolds containing only 1 collinear block.
   (2) collinearity cannot be broken when focal and subject blocks are BOTH terminal on their respective scaffolds
+
+NOTES
+  Cases where homologous blocks are found on the same scaffold are accounted for in the script, but are not counted as 'breaks' in this context
+  Use the script 'calculate_collinearity_palindromes.pl' to search for these cases.
+  Cases where a focal region shows >1 homologous region (e.g., recent duplications of A, B and B') are also discounted.
 \n";
 
 my ($collinearityfile,$gfffile,$scorefile,$blockspergenefile,$help,$morehelp,$verbose);
@@ -202,29 +207,21 @@ CHROM: foreach my $focal_chrom (nsort keys %gff_hash) {
     my $result = "collinear";
     $total_blocks++;
 
-    ## get identity of chrom2 (ie, non-focal chrom linked to focal chrom via block)
-    ## prob better way to do this but...
-    # my $i = 0;
-    # my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
-    # $i++ until $all_chroms_per_block[$i] eq $focal_chrom; ## get index of focal chrom
-    # splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
-
+    ## get identity of $homol_chrom (ie, non-focal chrom linked to focal chrom via block $focal_block)
     my %chroms_linked_to_block = %{ $blocks_hash_test{$focal_block} }; ## get all chroms linked by $focal_block
     if (scalar(keys(%chroms_linked_to_block))==1) { ## indication that focal and homol chrom are the same!
-      print STDERR "[INFO] Block $focal_block is linked to same scaffold (".(join ("\s", keys %chroms_linked_to_block)).")\n";
-      $description = "A and B on the same scaffold";
-      $result = "break"; ## this is a break
-      $noncollinear_blocks_linked_to_same_scaffold++;
+      print STDERR "[INFO]+ Block $focal_block is linked to same scaffold (".(join ("\s", keys %chroms_linked_to_block)).")!\n";
       next BLOCK; ## go straight to next block without evaluating code below
     } elsif (scalar(keys(%chroms_linked_to_block))>2) { ## indication that block may link to more than 2 chroms, eg could be caused by recent duplications leading to >2 homologous regions
-      print STDERR "[INFO] Block $focal_block is linked to multiple scaffolds (".(join ("\s", keys %chroms_linked_to_block)).")\n";
+      print STDERR "[INFO]+ Block $focal_block is linked to multiple scaffolds (".(join ("\s", keys %chroms_linked_to_block)).")!\n";
+      next BLOCK; ## also skip these cases
     }
     my ( $homol_chrom ) = grep { $_ ne $focal_chrom } keys %chroms_linked_to_block;
     # print STDERR "Focal chrom: $focal_chrom\n";
     # print STDERR join ("\t", $focal_block.":", (keys %chroms_linked_to_block), "\n");
     # print STDERR "Homol chrom: $homol_chrom\n\n";
 
-    my @blocks2 = @{$gff_hash{$homol_chrom}};# if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
+    my @blocks2 = @{$gff_hash{$homol_chrom}}; ## get all blocks on $homol_chrom
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on focal chrom
     my( $index2 ) = grep { $blocks2[$_] == $focal_block } 0..$#blocks2; ##get index of HOMOLOGOUS block on HOMOLOGOUS chrom2
 
@@ -298,7 +295,7 @@ close $OUT2;
 
 print STDERR "[INFO] Number of collinear blocks: ".commify($collinear_blocks)." (".percentage($collinear_blocks,$total_blocks).")\n";
 print STDERR "[INFO] Number of noncollinear blocks: ".commify($noncollinear_blocks)." (".percentage($noncollinear_blocks,$total_blocks).")\n";
-print STDERR "[INFO] Number of collinearity breaks: ".(($noncollinear_blocks/2)+$noncollinear_blocks_linked_to_same_scaffold)."\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
+print STDERR "[INFO] Number of collinearity breaks: ".($noncollinear_blocks/2)."\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
 print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
