@@ -172,7 +172,8 @@ while (<$PAINTED>) {
   if ($F[4] =~ /\-/) {
     next;
   } else {
-    push ( @{ $blocks_hash{$F[4]} }, $F[0]);# unless $seen{$F[0]}{$F[4]}; ##key= block, val= @[chroms involved in block]
+    #push ( @{ $blocks_hash{$F[4]} }, $F[0]) unless $seen{$F[0]}{$F[4]}; ##key= block, val= @[chroms involved in block]
+    $blocks_hash{$F[4]}{$F[0]}++;
     push ( @{ $gff_hash{$F[0]} }, $F[4] ) unless $seen{$F[0]}{$F[4]}; ##key= chrom, val= @[order of blocks along chrom]
     $seen{$F[0]}{$F[4]}++;
   }
@@ -196,20 +197,22 @@ print $OUT2 join ("\t",
 foreach my $chrom (nsort keys %gff_hash) {
   my @blocks1 = @{$gff_hash{$chrom}}; ## array of blocks along chrom
 
-  BLOCK: foreach my $focal_block (@blocks1) {
+  foreach my $focal_block (@blocks1) {
     my $description = "NULL";
     my $result = "collinear";
 
     ## get identity of chrom2 (ie, non-focal chrom linked to focal chrom via block)
     ## prob better way to do this but...
-    my $i = 0;
-    my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
-    $i++ until $all_chroms_per_block[$i] eq $chrom; ## get index of focal chrom
-    splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
-
-    if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
-      print STDERR "$focal_block: @all_chroms_per_block\n";
-    }
+    # my $i = 0;
+    # my @all_chroms_per_block = @{$blocks_hash{$focal_block}}; ## array of chroms involved in block; normally 2 but can be 1 if homologous blocks are on the same chrom
+    # $i++ until $all_chroms_per_block[$i] eq $chrom; ## get index of focal chrom
+    # splice(@all_chroms_per_block, $i, 1); ## throw out focal chrom, leaving chrom shared by block
+    #
+    # if ($all_chroms_per_block[0] eq $all_chroms_per_block[1]) {
+    #   print STDERR "$focal_block: @all_chroms_per_block\n";
+    # }
+    my %chroms = %{ $blocks_hash{$focal_block} }; ## all chroms linked by $focal_block
+    print STDERR join ("\t", $focal_block.":", (keys %chroms), "\n");
 
     my @blocks2 = @{$gff_hash{$all_chroms_per_block[0]}} if (defined($all_chroms_per_block[0])); ## get all blocks on chrom2
     my( $index1 ) = grep { $blocks1[$_] == $focal_block } 0..$#blocks1; ##get index of block in series of blocks on focal chrom
