@@ -10,7 +10,8 @@ use Sort::Naturally;
 
 my $usage = "
 INFO
-  Obsoleted by calculate_collinearity_breakpoints_GFF.pl
+  Obsoleted by calculate_collinearity_breakpoints.pl
+  Please use that script.
 
 SYNOPSIS
   Prints block number participation for all genes based on Ks threshold in new column of GFF
