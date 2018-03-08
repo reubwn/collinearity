@@ -8,25 +8,25 @@ Scripts to parse and analyse MCScanX collinearity output.
 ## MCScanX pipeline
 A typical MCScanX analysis following gene finding using Augustus or Braker might consist of:
 
-1. Run Diamond:
+1. **Run Diamond:**
    ```
    >> diamond makedb --in augustus.aa -d augustus.aa
    >> diamond blastp -e 1e-5 -p 8 -q augustus.aa -d augustus.aa -a augustus.aa.vs.self
    >> diamond view -a augustus.aa.vs.self.daa -o Xyz.blast
    ```
-2. Generate CDS:
+2. **Generate CDS:**
    ```
    >> /path/to/augustus-3.2.1/scripts/getAnnoFasta.pl --seqfile=../../scaffolds.fasta augustus.gff
    ```
-3. Generate GFF:
+3. **Generate GFF:**
    ```
    >> perl -lane 'print join("\t",$F[0],$F[8],$F[3],$F[4]) if ($F[2]eq"transcript")' augustus.gff > Xyz.gff
    ```
-4. Run MCScanX:
+4. **Run MCScanX:**
    ```
    >> mkdir results
    >> mv Xyz* results/
-   /path/to/MCScanX/MCScanX results/Xyz
+   >> /path/to/MCScanX/MCScanX results/Xyz
    ```
 
 ---
