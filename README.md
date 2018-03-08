@@ -5,12 +5,37 @@ Scripts to parse and analyse MCScanX collinearity output.
 
 [![DOI](https://zenodo.org/badge/92963110.svg)](https://zenodo.org/badge/latestdoi/92963110)
 
+## MCScanX pipeline
+A typical MCScanX analysis following gene finding using Augustus or Braker might consist of:
+
+1. Run Diamond:
+   ```
+   >> diamond makedb --in augustus.aa -d augustus.aa
+   >> diamond blastp -e 1e-5 -p 8 -q augustus.aa -d augustus.aa -a augustus.aa.vs.self
+   >> diamond view -a augustus.aa.vs.self.daa -o Xyz.blast
+   ```
+2. Generate CDS:
+   ```
+   >> /path/to/augustus-3.2.1/scripts/getAnnoFasta.pl --seqfile=../../scaffolds.fasta augustus.gff
+   ```
+3. Generate GFF:
+   ```
+   >> perl -lane 'print join("\t",$F[0],$F[8],$F[3],$F[4]) if ($F[2]eq"transcript")' augustus.gff > Xyz.gff
+   ```
+4. Run MCScanX:
+   ```
+   >> mkdir results
+   >> mv Xyz* results/
+   /path/to/MCScanX/MCScanX results/Xyz
+   ```
+
+---
+
 ## add_kaks_to_MCScanX.pl
 This script annotates the Xyz.collinearity output file from MCScanX analysis with Ka and Ks values for all pairs of genes.
 
 ### Prerequisites
-1. Requires ClustalO to be in `$PATH`
-2. `BioPerl` libraries
+Requires [ClustalO](http://www.clustal.org/omega/) to be in `$PATH` and some BioPerl libraries.
 
 ### Options
 Type `add_kaks_to_MCScanX.pl -h` to see the options:
