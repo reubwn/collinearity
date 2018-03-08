@@ -14,7 +14,7 @@ A typical MCScanX analysis following gene finding using Augustus or Braker might
    >> diamond blastp -e 1e-5 -p 8 -q augustus.aa -d augustus.aa -a augustus.aa.vs.self
    >> diamond view -a augustus.aa.vs.self.daa -o Xyz.blast
    ```
-2. Generate CDS:
+2. Generate CDS (required for Ka/Ks calculation):
    ```
    >> /path/to/augustus-3.2.1/scripts/getAnnoFasta.pl --seqfile=mygenome.fasta augustus.gff
    ```
