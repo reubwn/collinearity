@@ -24,8 +24,7 @@ OPTIONS
 ```
 
 ### Outputs
-1. Annotated MCScanX collinearity file
-2. Annotated MCScanX collinearity file also reformatted to remove some of the strange leading whitespaces etc.
+MCScanX collinearity file annotated with Ka and Ks per pair of genes.
 
 ## calculate_collinarity_metric.pl
 Calculates collinearity score based on the number of collinear genes divided by the total number of genes within that defined block (from [Flot et al. 2013](http://dx.doi.org/10.1038/nature12326)).
@@ -41,6 +40,7 @@ Also calculates average Ka and Ks per block, if run on annotated MCScanX file.
 
 ### Outputs
 A score file with per-block collinearity scores, average Ka and Ks etc.
+Also writes an MCScanX collinearity file reformatted to remove some of the strange leading whitespaces etc.
 
 ## calculate_collinarity_breakpoints.pl
 Searches for breaks in collinearity defined as occurrences where homologous blocks cannot be aligned along scaffolds without some rearrangement.

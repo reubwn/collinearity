@@ -191,7 +191,7 @@ GENE: while (<$PAINTED>) {
 close $PAINTED;
 # print STDERR "[INFO] Number of blocks linking exactly 2 homologous regions: ".commify(scalar(keys %blocks_hash))."\n";
 
-open (my $OUT2, ">$gfffile.sorted.painted.breaks") or die $!;
+open (my $OUT2, ">$collinearityfile.breakpoints") or die $!;
 print $OUT2 join ("\t",
                  "A.CHROM",
                  "A.BLOCKS",
@@ -314,7 +314,7 @@ print STDERR "[INFO] Number of collinear blocks: ".commify($c)." (".percentage($
 print STDERR "[INFO] Number of noncollinear blocks (different scaffolds): ".commify($n)." (".percentage($n,$T).")\n";
 print STDERR "[INFO] Number of noncollinear blocks (linked on same scaffold): ".commify($nl)." (".percentage($nl,$T).")\n";
 print STDERR "[INFO] Total number of collinearity breaks: ".commify(($n+$nl))." (".percentage(($n+$nl),$T).")\n"; ## /2 because each break is counted twice, from the perspective of both involved chroms
-print STDERR "[INFO] Results written to: $gfffile.sorted.painted.breaks\n";
+print STDERR "[INFO] Results written to: $collinearityfile.breakpoints\n";
 print STDERR "[INFO] Finished on ".`date`."\n";
 
 ############################# subs
