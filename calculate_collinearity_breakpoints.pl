@@ -92,9 +92,9 @@ print STDERR "[INFO] GFF file: $gfffile\n";
 print STDERR "[INFO] Score file: $scorefile\n";
 
 ## die unless refomatted collinearity file:
-unless ($collinearityfile =~ m/refomatted$/) {
-  die "[ERROR] Collinearity file: $collinearityfile is not reformatted\n";
-}
+# unless ($collinearityfile =~ m/refomatted$/) {
+#   die "[ERROR] Collinearity file: $collinearityfile is not reformatted\n";
+# }
 
 ## things we'll need:
 my (%collinearity_hash, %homologous_blocks_hash, %score_hash, %score_file_hash, %gff_hash, %blocks_hash, %seen);
