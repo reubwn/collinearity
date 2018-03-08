@@ -27,7 +27,10 @@ A typical MCScanX analysis following gene finding using Augustus or Braker might
    >> mkdir results
    >> mv Xyz* results/
    >> /path/to/MCScanX/MCScanX results/Xyz
+   >> /path/to/MCScanX/duplicate_gene_classifier results/Xyz
    ```
+
+This will produce the necessary files to then run the downstream analysis scripts outlined below.
 
 ---
 
