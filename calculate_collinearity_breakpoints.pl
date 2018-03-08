@@ -17,7 +17,7 @@ SYNOPSIS
   Uses GNU 'sort' to presort GFF file.
 
 OPTIONS
-  -i|--in     [FILE]  : collinearity file (use .reformatted!)
+  -i|--in     [FILE]  : collinearity file
   -g|--gff    [FILE]  : GFF file
   -s|--score  [FILE]  : score file with average Ks per block
   -k|--ks     [FLOAT] : Ks threshold to define homologous block (default <= 0.5)
@@ -27,7 +27,7 @@ OPTIONS
   -m|--morehelp       : print more help
 
 USAGE
-  calculate_collinearity_breakpoints.pl -i Xy.collinearity.kaks.reformatted -g Xy.gff -s Xy.collinearity.kaks.score
+  calculate_collinearity_breakpoints.pl -i Xyz.collinearity.kaks -g Xyz.gff -s Xyz.collinearity.kaks.score
 \n";
 
 my $definitions = "~~~
@@ -91,11 +91,6 @@ print STDERR "[INFO] Collinearity file: $collinearityfile\n";
 print STDERR "[INFO] GFF file: $gfffile\n";
 print STDERR "[INFO] Score file: $scorefile\n";
 
-## die unless refomatted collinearity file:
-# unless ($collinearityfile =~ m/refomatted$/) {
-#   die "[ERROR] Collinearity file: $collinearityfile is not reformatted\n";
-# }
-
 ## things we'll need:
 my (%collinearity_hash, %homologous_blocks_hash, %score_hash, %score_file_hash, %gff_hash, %blocks_hash, %seen);
 my (%total_blocks, %collinear_blocks, %noncollinear_blocks, %noncollinear_blocks_linked_to_same_scaffold, %blocks_linked_to_multiple_homol_regions);
@@ -114,12 +109,19 @@ while (<$COLL>) {
   if ($_ =~ /^#/) {
     next;
   } else {
-    $_ =~ s/^\s+|\s+$//g; ##remove leading and trailing whitespaces
-    my @F = split (m/\s+/, $_); ##split
-    # my @F = split (/\s+/, $_);
-    ## key= gene name; val= @{all blocks that gene is a member of}
-    push ( @{$collinearity_hash{$F[2]}}, $F[0] );
-    push ( @{$collinearity_hash{$F[3]}}, $F[0] );
+    $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing whitespaces
+    my @F = split (m/\s+/, $_); ## split
+    my $block_number;
+    if ($F[0]=~m/\d+\-\d+\:/) { ## sometimes columns not formatted properly... :/
+      my @a = split (m/\-/, $F[0]);
+      $block_number = $a[0];
+    } else {
+      $F[0] =~ s/\-//;
+      $block_number = $F[0]; ## this should also work if the .reformatted file is used
+    }
+    ## key= gene name; val= @[all blocks that gene is a member of]
+    push ( @{$collinearity_hash{$F[-4]}}, $block_number );
+    push ( @{$collinearity_hash{$F[-5]}}, $block_number );
   }
 }
 close $COLL;

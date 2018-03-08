@@ -30,11 +30,11 @@ OUTPUTS
   Will write '-2' for cases where Ka/Ks cannot be calculated.
 \n";
 
-my ($infile, $proteinfile, $cdsfile, $help);
+my ($collinearityfile, $proteinfile, $cdsfile, $help);
 my $threads = 1;
 
 GetOptions (
-  'i|in=s'      => \$infile,
+  'i|in=s'      => \$collinearityfile,
   'p|prot=s'    => \$proteinfile,
   'c|cds=s'     => \$cdsfile,
   't|threads:i' => \$threads,
@@ -42,11 +42,11 @@ GetOptions (
 );
 
 die $usage if $help;
-die $usage unless ($infile && $proteinfile && $cdsfile );
-my $outfile = "$infile.kaks";
-my $warningsfile = "$infile.kaks.warnings";
+die $usage unless ($collinearityfile && $proteinfile && $cdsfile );
+my $outfile = "$collinearityfile.kaks";
+my $warningsfile = "$collinearityfile.kaks.warnings";
 
-print STDERR "[INFO] Collinearity file: $infile\n";
+print STDERR "[INFO] Collinearity file: $collinearityfile\n";
 print STDERR "[INFO] Proteins file: $proteinfile\n";
 print STDERR "[INFO] CDS file: $cdsfile\n";
 print STDERR "[INFO] Parsing protein and CDS files...\n";
@@ -71,7 +71,7 @@ print STDERR "[INFO] Parsing collinearity file...\n";
 ## parse collinearity file:
 open (my $OUT, ">$outfile") or die "Cannot open $outfile: $!\n\n";
 open (my $WARN, ">$warningsfile") or die "Cannot open $warningsfile: $!\n\n";
-open (my $IN, $infile) or die "Cannot open $infile: $!\n\n";
+open (my $IN, $collinearityfile) or die "Cannot open $collinearityfile: $!\n\n";
 my ($ntrimmed,$na,$nskipped) = (0,0,0);
 my $n = 1;
 PAIR: while (<$IN>) {

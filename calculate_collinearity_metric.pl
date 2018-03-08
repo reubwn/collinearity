@@ -12,18 +12,17 @@ SYNOPSIS
   Calculates 'collinearity' score based on the number of collinear genes divided by the total number of genes within that defined block.
   Takes the collinearity file and the 'gff' file used in MCScanX analyses.
 
-  If ka/ks values are present, eg by running the MCScanX 'add_ka_and_ks_to_collinearity.pl' program first, script will also print average
-  ka and ks values per block if -k option is set.
+  If ka/ks values are present, eg by running the MCScanX 'add_kaks_to_MCScanX.pl' program first, script will also print average Ka and Ks values per block if -k option is set.
 
 OUTPUT
-  Prints to a file 'xyz.collinearity.score'; prints score for each block plus an average.
-  Also prints a file 'xyz.collinearity.reformatted', which (hopefully) removes some of the irritating formatting issues in the original MCScanX 'xyz.collinearity' file.
+  Prints to a file 'Xyz.collinearity.score'; prints score for each block plus an average.
+  Also prints a file 'Xyz.collinearity.reformatted', which removes some of the formatting issues in the original MCScanX 'Xyz.collinearity' file.
 
 OPTIONS
-  -i|--collinearity [FILE] : collinearity file from MCScanX
-  -g|--gff          [FILE] : modified gff file from MCScanX
-  -k|--kaks                : parse collinearity file to get average ka & ks per block
-  -h|--help                : print this message
+  -i|--in    [FILE] : collinearity file
+  -g|--gff   [FILE] : GFF file
+  -k|--kaks         : also calculate average Ka & Ks per block
+  -h|--help         : print this message
 
 USAGE
   >> calculate_collinarity_metric.pl -i xyz.collinearity -g xyz.gff
@@ -33,11 +32,11 @@ USAGE
 my ($collinearity, $gff, $kaks, $help, $debug);
 
 GetOptions (
-  'collinearity|i=s' => \$collinearity,
-  'gff|g=s'          => \$gff,
-  'kaks|k'           => \$kaks,
-  'help|h'           => \$help,
-  'debug|d'          => \$debug
+  'i|in=s'  => \$collinearity,
+  'g|gff=s' => \$gff,
+  'k|kaks'  => \$kaks,
+  'h|help'  => \$help,
+  'd|debug' => \$debug
 );
 
 die $usage if $help;
