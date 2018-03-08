@@ -60,8 +60,8 @@ Also calculates average Ka and Ks per block, if run on annotated MCScanX file.
 
 ### Options
 ```
-  -i|--in   [FILE] : collinearity file from MCScanX
-  -g|--gff  [FILE] : modified gff file from MCScanX
+  -i|--in   [FILE] : MCScanX collinearity file
+  -g|--gff  [FILE] : MCScanX GFF file
   -k|--kaks        : parse collinearity file to get average ka & ks per block
   -h|--help        : print this message
 ```
@@ -78,11 +78,10 @@ Type `calculate_collinarity_breakpoints.pl -m` to see full help and definitions.
 
 ### Options
 ```
-  -i|--in     [FILE]  : collinearity file (use .reformatted!)
-  -g|--gff    [FILE]  : GFF file
+  -i|--in     [FILE]  : MCScanX collinearity file
+  -g|--gff    [FILE]  : MCScanX GFF file
   -s|--score  [FILE]  : score file with average Ks per block
   -k|--ks     [FLOAT] : Ks threshold to define homologous block (default <= 0.5)
-  -o|--out            : outfile (default=INFILE.breaks)
   -b|--blocks         : also print blocks_per_gene file (default=no)
   -h|--help           : print help
   -m|--morehelp       : print more help
@@ -123,8 +122,8 @@ Decomposes any such cases into tandem arrays or palindromes.
 
 ### Options
 ```
--i|--in   [FILE] : collinearity file from MCScanX (annotated with Ks)
--g|--gff  [FILE] : GFF file
+-i|--in   [FILE] : MCScanX collinearity file (annotated with Ks)
+-g|--gff  [FILE] : MCScanX GFF file
 -k|--ks          : only examine blocks with Ks <= this threshold
 -h|--help        : print this message
 ```

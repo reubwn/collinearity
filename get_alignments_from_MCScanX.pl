@@ -19,7 +19,7 @@ SYNOPSIS
   Assumes Ks values are in the final column of the collinearity file (default).
 
 OPTIONS
-  -i|--in      [FILE]  : MCScanX collinearity file, annotated with Ka/Ks values
+  -i|--in      [FILE]  : MCScanX collinearity file (annotated with Ka/Ks)
   -p|--prot    [FILE]  : fasta file of protein sequences
   -c|--cds     [FILE]  : fasta file of corresponding CDS (nucleotide)
   -f|--fasta   [FILE]  : fasta file of genome

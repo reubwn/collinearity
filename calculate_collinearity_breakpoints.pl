@@ -17,11 +17,10 @@ SYNOPSIS
   Uses GNU 'sort' to presort GFF file.
 
 OPTIONS
-  -i|--in     [FILE]  : collinearity file
-  -g|--gff    [FILE]  : GFF file
+  -i|--in     [FILE]  : MCScanX collinearity file
+  -g|--gff    [FILE]  : MCScanX GFF file
   -s|--score  [FILE]  : score file with average Ks per block
   -k|--ks     [FLOAT] : Ks threshold to define homologous block (default <= 0.5)
-  -o|--out            : outfile (default=INFILE.breaks)
   -b|--blocks         : also print blocks_per_gene file (default=no)
   -h|--help           : print help
   -m|--morehelp       : print more help

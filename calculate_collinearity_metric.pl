@@ -19,8 +19,8 @@ OUTPUT
   Also prints a file 'Xyz.collinearity.reformatted', which removes some of the formatting issues in the original MCScanX 'Xyz.collinearity' file.
 
 OPTIONS
-  -i|--in    [FILE] : collinearity file
-  -g|--gff   [FILE] : GFF file
+  -i|--in    [FILE] : MCScanX collinearity file
+  -g|--gff   [FILE] : MCScanX GFF file
   -k|--kaks         : also calculate average Ka & Ks per block
   -h|--help         : print this message
 

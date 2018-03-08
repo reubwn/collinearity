@@ -14,8 +14,8 @@ SYNOPSIS
   Decomposes any such cases into tandem arrays or palindromes.
 
 OPTIONS
-  -i|--in   [FILE] : collinearity file from MCScanX (annotated with Ks)
-  -g|--gff  [FILE] : GFF file
+  -i|--in   [FILE] : MCScanX collinearity file (annotated with Ka/Ks)
+  -g|--gff  [FILE] : MCScanX GFF file
   -k|--ks          : only examine genes with Ks <= this threshold
   -h|--help        : print this message
 
