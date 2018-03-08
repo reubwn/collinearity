@@ -114,7 +114,9 @@ while (<$COLL>) {
   if ($_ =~ /^#/) {
     next;
   } else {
-    my @F = split (/\s+/, $_);
+    $_ =~ s/^\s+|\s+$//g; ##remove leading and trailing whitespaces
+    my @F = split (m/\s+/, $_); ##split
+    # my @F = split (/\s+/, $_);
     ## key= gene name; val= @{all blocks that gene is a member of}
     push ( @{$collinearity_hash{$F[2]}}, $F[0] );
     push ( @{$collinearity_hash{$F[3]}}, $F[0] );

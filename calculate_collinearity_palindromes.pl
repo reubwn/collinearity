@@ -13,16 +13,14 @@ SYNOPSIS
   Searched for cases of homologous regions physically linked on the same scaffolds.
   Decomposes any such cases into tandem arrays or palindromes.
 
-OUTPUT
-  1. arrays file       : all results
-  2. arrays.tandem     : tandem arrays
-  3. arrays.palindrome : palindromic arrays
-
 OPTIONS
   -i|--in   [FILE] : collinearity file from MCScanX (annotated with Ks)
   -g|--gff  [FILE] : GFF file
-  -k|--ks          : only examine blocks with Ks <= this threshold
+  -k|--ks          : only examine genes with Ks <= this threshold
   -h|--help        : print this message
+
+USAGE
+  calculate_collinarity_palindromes.pl -i Xyz.collinearity.kaks -g Xzy.gff -k 0.5
 \n";
 
 my ($collinearityfile,$gfffile,$help,$debug);
