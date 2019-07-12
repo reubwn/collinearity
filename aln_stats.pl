@@ -5,8 +5,9 @@ use warnings;
 use Getopt::Long;
 
 use Bio::AlignIO;
-use Bio::SimpleAlign;
+use File::Basename;
 use Sort::Naturally;
+use Bio::SimpleAlign;
 
 my $usage = "
 SYNOPSIS
@@ -36,7 +37,7 @@ GetOptions (
 die $usage if $help;
 die $usage unless ($path);
 
-my @files = glob ("*.$suffix");
+my @files = glob ("$path/*.$suffix");
 print STDERR "[INFO] Globbed ".scalar(@files)." '*.$suffix' files from $path\n";
 
 open (my $OUT_fh, ">$outfile") or die "$!\n";
