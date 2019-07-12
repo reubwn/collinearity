@@ -37,7 +37,7 @@ die $usage if $help;
 die $usage unless ($path);
 
 my @files = glob ("*.$suffix");
-print STDERR "[INFO] Globbed ".scalar(@files)." .'$suffix' files from $path\n";
+print STDERR "[INFO] Globbed ".scalar(@files)." '*.$suffix' files from $path\n";
 
 open (my $OUT_fh, ">$outfile") or die "$!\n";
 print STDERR "[INFO] Printing results to '$outfile'\n";
