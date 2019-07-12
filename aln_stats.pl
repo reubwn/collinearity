@@ -48,7 +48,7 @@ foreach my $file (nsort @files) {
   my $in = Bio::AlignIO->new( -file => $file, -format => $format );
   while ( my $aln_obj = $in->next_aln() ) {
     print $OUT_fh $aln_obj->num_sequences . "\t";
-    print $OUT_fh $aln_obj->percent_identity . "\n";
+    print $OUT_fh $aln_obj->percentage_identity . "\n";
   }
 }
 close $OUT_fh;
