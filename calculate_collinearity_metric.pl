@@ -52,10 +52,12 @@ while (<$COL>) {
   chomp;
   if ($_ =~ m/^#/) {
     print $REFORMAT "$_\n";
-    if ($_ =~ m/\s(\w+\d+)\&(\w+\w\d+)\s(plus|minus)$/) { ## get chrom names and strand orientation of block 2
-      $chrom1 = $1;
-      $chrom2 = $2;
-      $orientation = $3;
+    if ($_ =~ m/(plus|minus)$/) { ## get chrom names and strand orientation of block 2
+      $orientation = $1;
+      my @line = split (/\s+/, $_);
+      my @chroms = split (/&/, $line[-2]);
+      $chrom1 = $chroms[0];
+      $chrom2 = $chroms[1];
       next;
     } else {
       next;

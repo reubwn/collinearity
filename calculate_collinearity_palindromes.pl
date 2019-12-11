@@ -62,10 +62,12 @@ open (my $IN, $collinearityfile) or die $!;
 while (<$IN>) {
   chomp;
   if ($_ =~ m/^#/) {
-    if ($_ =~ m/\s(\w+\d+)\&(\w+\w\d+)\s(plus|minus)$/) { ## get chrom names and strand orientation of block 2
-      $chrom1 = $1;
-      $chrom2 = $2;
-      $orientation = $3;
+    if ($_ =~ m/(plus|minus)$/) { ## get chrom names and strand orientation of block 2
+      $orientation = $1;
+      my @line = split (/\s+/, $_);
+      my @chroms = split (/&/, $line[-2]);
+      $chrom1 = $chroms[0];
+      $chrom2 = $chroms[1];
       next;
     }
   } else {
@@ -167,7 +169,7 @@ sub percentage {
       my $places = "\%.2f"; ## default is two decimal places
       if (exists $_[2]){$places = "\%.".$_[2]."f";};
       my $float = (($numerator / $denominator)*100);
-      my $result = sprintf("$places",$float);
+      $result = sprintf("$places",$float);
     } else {
       $result = 0;
     }
