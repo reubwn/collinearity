@@ -172,7 +172,7 @@ print STDERR "\n[INFO] Finished on ".`date`."\n";
 
 sub avg {
   if (scalar(@_) == 0) {
-    return 0;
+    return '-2';
   } else {
     return sum(@_)/@_;
   }
