@@ -171,7 +171,11 @@ close $OUT;
 print STDERR "\n[INFO] Finished on ".`date`."\n";
 
 sub avg {
-  return sum(@_)/@_;
+  if (scalar(@_) == 0) {
+    return 0;
+  } else {
+    return sum(@_)/@_;
+  }
 }
 
 __END__
